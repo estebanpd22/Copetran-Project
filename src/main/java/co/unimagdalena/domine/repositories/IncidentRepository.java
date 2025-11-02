@@ -1,4 +1,17 @@
 package co.unimagdalena.domine.repositories;
 
-public class AssignamentRepository {
+import co.unimagdalena.domine.entities.EntityType;
+import co.unimagdalena.domine.entities.Incident;
+import co.unimagdalena.domine.entities.IncidentType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface IncidentRepository extends JpaRepository<Incident, Long> {
+    List<Incident> findByEntityType(EntityType entityType);
+
+    @Query("SELECT i FROM Incident i WHERE i.incidentType= :type ORDER BY i.createdAt DESC")
+    List<Incident> findRecentByType(@Param("type") IncidentType type);
 }

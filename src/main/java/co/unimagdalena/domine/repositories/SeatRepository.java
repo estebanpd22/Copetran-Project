@@ -1,37 +1,15 @@
-package co.unimagdalena.domine.entities;
+package co.unimagdalena.domine.repositories;
 
-import jakarta.persistence.*;
-import lombok.*;
+import co.unimagdalena.domine.entities.Seat;
+import co.unimagdalena.domine.entities.SeatType;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
-@Entity
-@Table(name = "seats")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Seat {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private BigDecimal price;
-
-    @Column(nullable = false)
-    private Integer number;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SeatType type;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SeatStatus status;
-
-    @ManyToOne
-    @JoinColumn(name = "bus_id",foreignKey = @ForeignKey(name = "fk_seat_bus"))
-    private Bus bus;
+public interface SeatRepository extends JpaRepository<Seat,Long> {
+    List<Seat> finByBusIdOrderByNumberAsc(Long busId);
+    Optional<Seat> findByBusIdAndNumber(Long busId, String number);
+    List<Seat> finByBusIdAndType(Long busId, SeatType type);
+    long countByBusId(Long busId);
 }
