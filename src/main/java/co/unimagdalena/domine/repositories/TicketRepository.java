@@ -1,0 +1,30 @@
+package co.unimagdalena.domine.repositories;
+
+import co.unimagdalena.domine.entities.Ticket;
+import co.unimagdalena.domine.entities.TicketStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+
+public interface TicketRepository extends JpaRepository<Ticket,Long> {
+    List<Ticket> findByTripId(Long tripId);
+    List<Ticket> findByPassengerId(Long passengerId);
+    List<Ticket> findByPurchaseId(Long purchaseId);
+    Optional<Ticket> findByQrCode(String qrCode);
+    List<Ticket> findByStatus(String status);
+
+    @Query("SELECT COUNT(t) FROM Ticket t WHERE t.trip.id = :tripId AND t.status = 'SOLD'")
+    long countSoldByTrip(@Param("tripId") Long tripId);
+
+    @Query("""
+        SELECT COUNT(DISTINCT T) FROM Ticket T
+        WHERE T.status = :status AND (:start IS NULL OR T.createdAt >= :start)
+            AND (:end IS NULL OR T.createdAt <= :end)
+    """)
+    long countByStatusAndOptionalDateRange(@Param("status") TicketStatus status, @Param("start") OffsetDateTime start,
+                                           @Param("end") OffsetDateTime end);
+}
