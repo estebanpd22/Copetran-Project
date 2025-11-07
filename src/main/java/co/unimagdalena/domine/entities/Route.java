@@ -18,22 +18,22 @@ public class Route {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "code")
     private String code;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "name")
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "origin")
     private String origin;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "destination")
     private String destination;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "distance_km")
     private Float distanceKm;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "duration_min")
     private Float durationMin;
 
     @OneToMany(mappedBy = "route", fetch = FetchType.LAZY)

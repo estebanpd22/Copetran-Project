@@ -15,9 +15,9 @@ public class Config {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, name = "key")
     private String key;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "value")
     private String value;
 }
