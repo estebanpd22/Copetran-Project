@@ -13,6 +13,7 @@ import lombok.*;
 public class Config {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "config_id")
     private Long id;
 
     @Column(unique = true, nullable = false, name = "key")

@@ -35,7 +35,7 @@ public interface TripRepository extends JpaRepository<Trip,Long> {
     @Query( "SELECT t " +
             "FROM Trip t " +
             "WHERE t.date = :date " +
-            "      AND t.status = 'SCHEDULED' " +
+            "       AND CAST(t.status AS string) = 'SCHEDULED'" +
             "      AND t.departureAt <= :threshold")
     List<Trip> findTripsNearDeparture(@Param("date") LocalDate date,
                                       @Param("threshold") OffsetDateTime threshold);

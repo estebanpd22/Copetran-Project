@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FareRuleRepository extends JpaRepository<FareRule,Long> {
-    Optional<FareRule> finByRouteIdAndFromStopIdAndToStopId(Long routeId, Long fromStopId, Long toStopId);
+    Optional<FareRule> findByRouteIdAndFromStopIdAndToStopId(Long routeId, Long fromStopId, Long toStopId);
     List<FareRule> findByRouteId(Long routeId);
 
     List<FareRule> findByRouteIdAndDynamicPricing(Long routeId, DynamicPricing DynamicPricing);

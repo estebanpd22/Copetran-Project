@@ -15,6 +15,7 @@ import java.time.LocalTime;
 public class Incident {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "incident_id")
     private Long id;
 
     @Column(nullable = false)

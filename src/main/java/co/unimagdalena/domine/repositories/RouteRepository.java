@@ -10,7 +10,7 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     Optional<Route> findRouteById(Long id);
     Optional<Route> findByCode(String code);
     List<Route> findRoutesByName(String name);
-    List<Route> finByOriginAndDestination(String origin, String destination);
+    List<Route> findByOriginAndDestination(String origin, String destination);
 
     //Obtener la rutas ordenadas de menor a mayor cantidad de kilometros, indicando el origen y destino,
     List<Route> findRoutesByOriginAndDestinationOrderByDistanceKmAsc(String origin, String destination);

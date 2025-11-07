@@ -19,7 +19,7 @@ public interface BusRepository extends JpaRepository<Bus,Long> {
 
     Optional<Bus> findByPlate(String plate);
 
-    List<Bus> finByStatus(String status);
+    List<Bus> findBusesByStatus(BusStatus status);
 
     @Query("SELECT b " +
             "FROM Bus b " +
@@ -38,4 +38,11 @@ public interface BusRepository extends JpaRepository<Bus,Long> {
             "SET b.status = :status " +
             "WHERE b.id = :busId")
     void changeBusStatus(@Param("busId") Long busId, @Param("status") BusStatus status);
+
+    //Porcentaje de ocupacion (overbooking) del bus escala -> 0.0 - 1.0
+    //Retorna la proporcion de sillas ocupadas con respecto a la capacidad maxima del bus
+    @Query("SELECT COUNT(s.id) / b.capacity FROM Bus b " +
+            "JOIN Seat s WHERE s.bus.id = :busId AND b.id = :busId " +
+            "               AND CAST(s.status AS string) = 'TAKEN'")
+    Float calculateOverBooking(@Param("busId") Long buId);
 }

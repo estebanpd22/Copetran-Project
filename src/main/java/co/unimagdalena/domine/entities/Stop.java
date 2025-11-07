@@ -16,6 +16,7 @@ import java.util.List;
 public class Stop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "stop_id")
     private Long id;
 
     @Column(nullable = false, name = "name")

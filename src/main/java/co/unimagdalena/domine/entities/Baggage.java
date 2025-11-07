@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 public class Baggage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "baggage_id")
     private Long id;
 
     @Column(nullable = false, name = "weight_kg")

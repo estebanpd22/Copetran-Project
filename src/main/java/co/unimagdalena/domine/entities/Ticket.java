@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ticket_id")
     private Long id;
 
     @Column(nullable = false, name = "price")

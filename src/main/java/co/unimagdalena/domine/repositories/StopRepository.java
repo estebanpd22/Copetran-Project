@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StopRepository extends JpaRepository<Stop,Long> {
-    List<Stop> finByRouteIdOrderByOrderAsc(Long routeId);
+    Optional<Stop> findStopById(Long id);
+    List<Stop> findByRouteIdOrderByOrderAsc(Long routeId);
     Optional<Stop> findByRouteIdAndOrder(Long routeId, Integer order);
     boolean existsByRouteIdAndId(Long routeId, Long stopId);
     @Query( "SELECT s " +

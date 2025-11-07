@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,7 @@ import java.util.Set;
 public class Bus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "bus_id")
     private Long id;
 
     @Column(nullable = false, unique = true, name = "plate")
@@ -35,15 +37,17 @@ public class Bus {
     @Column(nullable = false, name = "soat")
     private OffsetDateTime soatExpirationDate;
 
-    @OneToMany(mappedBy = "bus", fetch = FetchType.LAZY)
-    private List<Trip> trips;
+    @OneToMany(mappedBy = "bus", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Builder.Default
+    private List<Trip> trips =  new ArrayList<>();
     public void addTrip(Trip trip) {
         this.trips.add(trip);
         trip.setBus(this);
     }
 
-    @OneToMany(mappedBy = "bus",fetch = FetchType.LAZY)
-    private List<Seat> seats;
+    @OneToMany(mappedBy = "bus",fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Builder.Default
+    private List<Seat> seats =  new ArrayList<>();
     public void addSeat(Seat seat) {
         this.seats.add(seat);
         seat.setBus(this);
@@ -51,5 +55,6 @@ public class Bus {
 
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
+    @Builder.Default
     private Set<Amenity> amenities = new HashSet<>();
 }

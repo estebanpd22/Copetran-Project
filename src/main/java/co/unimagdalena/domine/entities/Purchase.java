@@ -18,6 +18,7 @@ import java.util.List;
 public class Purchase {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "purchase_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)

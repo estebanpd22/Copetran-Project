@@ -16,6 +16,7 @@ import java.time.OffsetDateTime;
 public class SeatHold {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "seat_hold_id")
     private Long id;
 
     @Column(name = "seat_number", nullable = false)
