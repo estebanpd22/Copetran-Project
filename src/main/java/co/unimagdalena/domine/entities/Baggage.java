@@ -17,12 +17,13 @@ public class Baggage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "weight_kg")
     private Float weightKg;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "fee")
     private BigDecimal fee;
 
+    @Column(name = "tag_code")
     private String tagCode;
 
     @ManyToOne

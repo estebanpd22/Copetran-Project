@@ -17,10 +17,10 @@ public class Assignment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private boolean checkListOk;
+    @Column(nullable = false, name = "check_list_ok")
+    private boolean checkListOk = false;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "assigned_at")
     private LocalDate  assignedAt;
 
     @OneToOne

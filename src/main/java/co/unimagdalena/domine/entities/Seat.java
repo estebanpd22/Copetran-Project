@@ -17,14 +17,14 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "price")
     private BigDecimal price;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "number")
     private Integer number;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "type")
     private SeatType type;
 
     @Enumerated(EnumType.STRING)

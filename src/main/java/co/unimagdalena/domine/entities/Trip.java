@@ -19,16 +19,16 @@ public class Trip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "date")
     private LocalDate date;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "departure_at")
     private OffsetDateTime departureAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "arrival_at")
     private OffsetDateTime arrivalAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "status")
     private TripStatus status;
 
     @ManyToOne

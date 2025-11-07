@@ -21,11 +21,11 @@ public class SeatHold {
     @Column(name = "seat_number", nullable = false)
     private String seatNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "expire_at")
     private OffsetDateTime expiresAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "seat_hold_status")
     private SeatHoldStatus status;
 
     @OneToOne

@@ -19,14 +19,10 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "price")
     private BigDecimal price;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
-
-    @Column(nullable = false)
+    @Column(nullable = false, name = "ticket_status")
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
 
@@ -34,15 +30,16 @@ public class Ticket {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
+    @Column(name = "qr_code")
     private String qrCode;
+
+    @ManyToOne
+    @JoinColumn(name = "purchase_id")
+    private Purchase purchase;
 
     @ManyToOne
     @JoinColumn(name = "trip_id")
     private Trip trip;
-
-    @ManyToOne
-    @JoinColumn(name = "passenger_id", referencedColumnName = "user_id")
-    private User passenger;
 
     @ManyToOne
     @JoinColumn(name = "seat_id")

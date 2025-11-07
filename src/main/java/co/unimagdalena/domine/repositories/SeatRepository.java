@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface SeatRepository extends JpaRepository<Seat,Long> {
     List<Seat> finByBusIdOrderByNumberAsc(Long busId);
-    Optional<Seat> findByBusIdAndNumber(Long busId, String number);
+    Optional<Seat> findByBusIdAndNumber(Long busId, Integer number);
     List<Seat> finByBusIdAndType(Long busId, SeatType type);
     long countByBusId(Long busId);
 }

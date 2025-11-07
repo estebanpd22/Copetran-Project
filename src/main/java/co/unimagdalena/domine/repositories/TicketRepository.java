@@ -12,10 +12,10 @@ import java.util.Optional;
 
 public interface TicketRepository extends JpaRepository<Ticket,Long> {
     List<Ticket> findByTripId(Long tripId);
-    List<Ticket> findByPassengerId(Long passengerId);
     List<Ticket> findByPurchaseId(Long purchaseId);
     Optional<Ticket> findByQrCode(String qrCode);
-    List<Ticket> findByStatus(String status);
+    List<Ticket> findTicketByStatus(TicketStatus status);
+    List<Ticket> findByPurchaseUserId(Long purchaseUserId);
 
     @Query("SELECT COUNT(t) FROM Ticket t WHERE t.trip.id = :tripId AND t.status = 'SOLD'")
     long countSoldByTrip(@Param("tripId") Long tripId);

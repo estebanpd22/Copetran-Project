@@ -18,16 +18,16 @@ public class Stop {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "name")
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "order")
     private Integer order;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "latitude")
     private double latitude;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "longitud")
     private double longitude;
 
     @ManyToOne
