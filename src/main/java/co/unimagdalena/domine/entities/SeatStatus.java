@@ -2,5 +2,7 @@ package co.unimagdalena.domine.entities;
 
 public enum SeatStatus {
     AVAILABLE,
-    UNAVAILABLE
+    UNAVAILABLE,
+    TAKEN,
+    ON_HOLD
 }

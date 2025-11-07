@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false, name = "full_name")
@@ -38,4 +41,8 @@ public class User {
 
     @Column(nullable = false, name = "status")
     private UserStatus status;
+
+    @OneToMany(mappedBy = "driver",  fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Assignment> assignments =  new ArrayList<>();
 }

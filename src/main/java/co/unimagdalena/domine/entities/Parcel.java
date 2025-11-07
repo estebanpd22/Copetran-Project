@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 public class Parcel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "parcel_id")
     private Long id;
 
     @Column(nullable = false, unique = true, name = "code")

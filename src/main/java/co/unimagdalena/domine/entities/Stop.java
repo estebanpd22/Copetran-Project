@@ -16,6 +16,7 @@ import java.util.List;
 public class Stop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "stop_id")
     private Long id;
 
     @Column(nullable = false, name = "name")
@@ -36,6 +37,7 @@ public class Stop {
 
     // Reglas donde esta parada es el origen (from_stop)
     @OneToMany(mappedBy = "fromStop", fetch = FetchType.LAZY, orphanRemoval = true)
+    @Builder.Default
     private List<FareRule> fareRulesFrom = new ArrayList<>();
     public void addFareRuleFrom(FareRule fareRule) {
         this.fareRulesFrom.add(fareRule);
@@ -44,6 +46,7 @@ public class Stop {
 
     // Reglas donde esta parada es el destino (to_stop)
     @OneToMany(mappedBy = "toStop", fetch = FetchType.LAZY, orphanRemoval = true)
+    @Builder.Default
     private List<FareRule> fareRulesTo = new ArrayList<>();
     public void addFareRuleTo(FareRule fareRule) {
         this.fareRulesTo.add(fareRule);

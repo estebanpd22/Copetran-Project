@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 public class Seat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "seat_id")
     private Long id;
 
     @Column(nullable = false, name = "price")

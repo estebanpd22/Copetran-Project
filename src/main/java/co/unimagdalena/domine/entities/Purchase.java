@@ -2,9 +2,11 @@ package co.unimagdalena.domine.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,6 +19,7 @@ import java.util.List;
 public class Purchase {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "purchase_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -35,7 +38,8 @@ public class Purchase {
 
     @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Column(nullable = false)
-    private List<Ticket> tickets;
+    @Builder.Default
+    private List<Ticket> tickets =  new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id")

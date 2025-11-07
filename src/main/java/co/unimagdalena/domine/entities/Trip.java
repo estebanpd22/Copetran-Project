@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "trip_id")
     private Long id;
 
     @Column(nullable = false, name = "date")

@@ -19,6 +19,7 @@ import java.util.Map;
 public class FareRule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "fare_rule_id")
     private Long id;
 
     @Column(nullable = false, name = "base_price")
