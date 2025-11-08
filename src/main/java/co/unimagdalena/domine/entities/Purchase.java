@@ -37,6 +37,7 @@ public class Purchase {
 
     @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Column(nullable = false)
+    @Builder.Default
     private List<Ticket> tickets;
 
     @ManyToOne

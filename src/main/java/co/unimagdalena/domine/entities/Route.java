@@ -38,6 +38,7 @@ public class Route {
     private Float durationMin;
 
     @OneToMany(mappedBy = "route", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Stop> stops = new ArrayList<>();
 
     public void addStop(Stop stop) {
@@ -46,6 +47,7 @@ public class Route {
     }
 
     @OneToMany(mappedBy = "route", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Trip>  trips = new ArrayList<>();
     public void addTrip(Trip trip) {
         this.trips.add(trip);
@@ -53,6 +55,7 @@ public class Route {
     }
 
     @OneToMany(mappedBy = "route", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<FareRule> fareRules = new ArrayList<>();
     public void addFareRule(FareRule fareRule) {
         this.fareRules.add(fareRule);

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -42,5 +43,6 @@ public class User {
     private UserStatus status;
 
     @OneToMany(mappedBy = "driver",  fetch = FetchType.LAZY)
-    private List<Assignment> assignments;
+    @Builder.Default
+    private List<Assignment> assignments =  new ArrayList<>();
 }
