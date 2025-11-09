@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,7 +18,8 @@ public interface SeatHoldRepository extends JpaRepository<SeatHold, Long> {
     List<SeatHold> findExpiredHolds();
 
     //El estado de una silla es dinamico, puede ser modificado en cualquier momento
-    @Modifying
+    @Modifying(clearAutomatically = true)
+    @Transactional
     @Query("UPDATE Bus b " +
             "SET b.status = :status " +
             "WHERE b.id = :busId")

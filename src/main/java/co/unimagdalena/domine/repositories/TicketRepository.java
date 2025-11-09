@@ -1,5 +1,6 @@
 package co.unimagdalena.domine.repositories;
 
+import co.unimagdalena.domine.entities.Seat;
 import co.unimagdalena.domine.entities.Ticket;
 import co.unimagdalena.domine.entities.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,9 +22,11 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     long countSoldByTrip(@Param("tripId") Long tripId);
 
     @Query("""
-        SELECT COUNT(DISTINCT T) FROM Ticket T
-        WHERE T.status = :status AND (:start IS NULL OR T.createdAt >= :start)
-            AND (:end IS NULL OR T.createdAt <= :end)
+    SELECT COUNT(t)
+    FROM Ticket t
+    WHERE t.status = :status
+      AND t.createdAt >= COALESCE(:start, t.createdAt)
+      AND t.createdAt <= COALESCE(:end, t.createdAt)
     """)
     long countByStatusAndOptionalDateRange(@Param("status") TicketStatus status, @Param("start") OffsetDateTime start,
                                            @Param("end") OffsetDateTime end);

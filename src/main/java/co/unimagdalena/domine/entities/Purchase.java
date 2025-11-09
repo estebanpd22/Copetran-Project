@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,7 +39,7 @@ public class Purchase {
     @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Column(nullable = false)
     @Builder.Default
-    private List<Ticket> tickets;
+    private List<Ticket> tickets = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id")

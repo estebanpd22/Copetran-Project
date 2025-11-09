@@ -16,6 +16,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     List<Assignment> findByDriver(@Param("driverId") Long driverId);
 
     //Asignaciones a la está vinculado un repartidor
-    @Query("SELECT a FROM Assignment a WHERE a.dispatcher.id = :dispacherId")
+    @Query("SELECT a FROM Assignment a WHERE a.dispatcher.id = :dispatcherId")
     List<Assignment> findByDispatcher(@Param("dispatcherId") Long dispatcherId);
 }

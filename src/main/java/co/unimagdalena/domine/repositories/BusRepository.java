@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,8 @@ public interface BusRepository extends JpaRepository<Bus,Long> {
     //Buses que tenga viajes especificados
     List<Bus> findBusesByTrips(List<Trip> trips);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
+    @Transactional
     @Query("UPDATE Bus b " +
             "SET b.status = :status " +
             "WHERE b.id = :busId")
@@ -41,8 +43,9 @@ public interface BusRepository extends JpaRepository<Bus,Long> {
 
     //Porcentaje de ocupacion (overbooking) del bus escala -> 0.0 - 1.0
     //Retorna la proporcion de sillas ocupadas con respecto a la capacidad maxima del bus
-    @Query("SELECT COUNT(s.id) / b.capacity FROM Bus b " +
-            "JOIN Seat s WHERE s.bus.id = :busId AND b.id = :busId " +
-            "               AND CAST(s.status AS string) = 'TAKEN'")
-    Float calculateOverBooking(@Param("busId") Long buId);
+    @Query("SELECT (CAST(COUNT(s.id) AS double) / b.capacity) " +
+            "FROM Bus b JOIN b.seats s " +
+            "WHERE b.id = :busId AND s.status = co.unimagdalena.domine.entities.SeatStatus.TAKEN " +
+            "GROUP BY b.id, b.capacity") // <-- ¡La clave para resolver el error!
+    Double calculateOccupancyRate(@Param("busId") Long busId);
 }

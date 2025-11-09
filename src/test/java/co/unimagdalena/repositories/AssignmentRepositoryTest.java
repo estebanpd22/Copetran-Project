@@ -127,13 +127,13 @@ public class AssignmentRepositoryTest extends AbstractRepositoryTI {
         User dispatcher = createUser("Carlitos dispatcher", "carlitosdispatcher@gmail.com"
                 , "dispatcher123", UserRole.DISPATCHER, UserStatus.ACTIVE, date.minusDays(2), "3044978652");
 
-        var assignment = createAssignment(date, true, trip1, dispatcher, driver);
+        Assignment assignment = createAssignment(date, true, trip1, dispatcher, driver);
 
         //When
-        Optional<Assignment> found = assignmentRepository.findAssignmentByTrip_Id(1L);
+        Optional<Assignment> found = assignmentRepository.findAssignmentByTrip_Id(trip1.getId());
 
         //Then
-        assertThat(found).isPresent();
+        assertThat(found.isPresent()).isTrue();
         assertThat(found.get().getId()).isNotNull();
         assertThat(found.get().isCheckListOk()).isTrue();
         assertThat(found.get().getAssignedAt()).isEqualTo(date);
@@ -162,6 +162,120 @@ public class AssignmentRepositoryTest extends AbstractRepositoryTI {
         assertThat(found.get().getDispatcher().getPhone()).isEqualTo("3044978652");
         assertThat(found.get().getDispatcher().getRole()).isEqualTo(UserRole.DISPATCHER);
         assertThat(found.get().getDispatcher().getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    @DisplayName("Debe encontrar las asignaciones segun el id del driver")
+    void shouldFindByDriver(){
+        //Given
+        LocalDateTime date = LocalDateTime.now().minusMonths(2);
+        LocalDateTime actualTime = LocalDateTime.now();
+        OffsetDateTime departure = OffsetDateTime.now();
+        OffsetDateTime arrival = OffsetDateTime.now().plusHours(2);
+        LocalDate date1 = LocalDate.now();
+
+        Route route = createRoute("code", "Barranquilla",
+                "Bucaramanga", Float.MIN_NORMAL,
+                Float.MIN_NORMAL, "barranquillaBucaramanga");
+
+        Bus bus = createBusWithOutSaving("KS21",
+                Set.of(new Amenity(1L, "dos pisos")),
+                2,
+                OffsetDateTime.now().plusMonths(2),
+                BusStatus.ASSIGNED);
+
+        Seat seat1 = createSeat(3, BigDecimal.valueOf(25000), SeatType.STANDARD, SeatStatus.TAKEN);
+        Seat seat2 = createSeat(4, BigDecimal.valueOf(25000), SeatType.STANDARD, SeatStatus.ON_HOLD);
+
+        bus.setSeats(List.of(seat1, seat2));
+
+        Trip trip1 = createTrip(date1.plusDays(2), departure, arrival, TripStatus.BOARDING, route);
+
+        bus.addTrip(trip1);
+        bus = busRepository.save(bus);
+
+        User driver = createUser("Puellito driver", "puellitodriver@gmail.com",
+                "driverpassword123", UserRole.DRIVER,
+                UserStatus.ACTIVE, date, "3002389429");
+        User dispatcher = createUser("Puellito dispatcher", "puellitodispatcher@gmail.com",
+                "dispatcher123", UserRole.DISPATCHER, UserStatus.ACTIVE,
+                actualTime.minusDays(2), "3044978652");
+
+        Assignment assignment = createAssignment(actualTime, true, trip1, dispatcher, driver);
+
+
+        //When
+        List<Assignment> assignments = assignmentRepository.findByDriver(driver.getId());
+
+        //Then
+        assertThat(assignments.size()).isEqualTo(1);
+        assertThat(assignments.getFirst()).isNotNull();
+
+        assertThat(assignments.getFirst().getDriver().getId()).isNotNull();
+        assertThat(assignments.getFirst().getDriver().getFullName()).isEqualTo("Puellito driver");
+        assertThat(assignments.getFirst().getDriver().getEmail()).isEqualTo("puellitodriver@gmail.com");
+        assertThat(assignments.getFirst().getDriver().getPasswordHash()).isEqualTo("driverpassword123");
+        assertThat(assignments.getFirst().getDriver().getRole()).isEqualTo(UserRole.DRIVER);
+        assertThat(assignments.getFirst().getDriver().getCreatedAt()).isEqualTo(date);
+        assertThat(assignments.getFirst().getDriver().getPhone()).isEqualTo("3002389429");
+        assertThat(assignments.getFirst().getDriver().getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    @DisplayName("Debe encontrar las asignaciones segun el id del dispatcher")
+    void shouldFindByDispatcher(){
+        //Given
+        LocalDateTime date = LocalDateTime.now().minusMonths(2);
+        LocalDateTime actualTime = LocalDateTime.now();
+        OffsetDateTime departure = OffsetDateTime.now();
+        OffsetDateTime arrival = OffsetDateTime.now().plusHours(2);
+        LocalDate date1 = LocalDate.now();
+
+        Route route = createRoute("code", "Barranquilla",
+                "Bucaramanga", Float.MIN_NORMAL,
+                Float.MIN_NORMAL, "barranquillaBucaramanga");
+
+        Bus bus = createBusWithOutSaving("KS21",
+                Set.of(new Amenity(1L, "dos pisos")),
+                2,
+                OffsetDateTime.now().plusMonths(2),
+                BusStatus.ASSIGNED);
+
+        Seat seat1 = createSeat(3, BigDecimal.valueOf(25000), SeatType.STANDARD, SeatStatus.TAKEN);
+        Seat seat2 = createSeat(4, BigDecimal.valueOf(25000), SeatType.STANDARD, SeatStatus.ON_HOLD);
+
+        bus.setSeats(List.of(seat1, seat2));
+
+        Trip trip1 = createTrip(date1.plusDays(2), departure, arrival, TripStatus.BOARDING, route);
+
+        bus.addTrip(trip1);
+        bus = busRepository.save(bus);
+
+        User driver = createUser("Puellito driver", "puellitodriver@gmail.com",
+                "driverpassword123", UserRole.DRIVER,
+                UserStatus.ACTIVE, date, "3002389429");
+        User dispatcher = createUser("Puellito dispatcher", "puellitodispatcher@gmail.com",
+                "dispatcher123", UserRole.DISPATCHER, UserStatus.ACTIVE,
+                actualTime.minusDays(2), "3044978652");
+
+        Assignment assignment = createAssignment(actualTime, true, trip1, dispatcher, driver);
+
+
+        //When
+        List<Assignment> assignments = assignmentRepository.findByDispatcher(dispatcher.getId());
+
+        //Then
+        assertThat(assignments.size()).isEqualTo(1);
+        assertThat(assignments.getFirst()).isNotNull();
+
+        assertThat(assignments.getFirst().getDispatcher().getId()).isNotNull();
+        assertThat(assignments.getFirst().getDispatcher().getFullName()).isEqualTo("Puellito dispatcher");
+        assertThat(assignments.getFirst().getDispatcher().getEmail()).isEqualTo("puellitodispatcher@gmail.com");
+        assertThat(assignments.getFirst().getDispatcher().getPasswordHash()).isEqualTo("dispatcher123");
+        assertThat(assignments.getFirst().getDispatcher().getRole()).isEqualTo(UserRole.DISPATCHER);
+        assertThat(assignments.getFirst().getDispatcher().getCreatedAt()).isEqualTo(actualTime.minusDays(2));
+        assertThat(assignments.getFirst().getDispatcher().getPhone()).isEqualTo("3044978652");
+        assertThat(assignments.getFirst().getDispatcher().getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 }
 

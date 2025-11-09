@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,8 @@ public interface FareRuleRepository extends JpaRepository<FareRule,Long> {
 
     List<FareRule> findByRouteIdAndDynamicPricing(Long routeId, DynamicPricing DynamicPricing);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
+    @Transactional
     @Query("UPDATE FareRule fr " +
             "SET fr.dynamicPricing = :status " +
             "WHERE fr.id = :fareRuleId")
