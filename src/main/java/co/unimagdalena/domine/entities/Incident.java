@@ -15,22 +15,23 @@ import java.time.LocalTime;
 public class Incident {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "incident_id")
     private Long id;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private EntityType entityType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "entity_id")
     private Long entityId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name ="incident_type")
     private IncidentType incidentType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "note")
     private String note;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "created_at")
     private LocalTime createdAt;
 }

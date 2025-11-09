@@ -17,18 +17,19 @@ import java.time.OffsetDateTime;
 public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "trip_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "date")
     private LocalDate date;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "departure_at")
     private OffsetDateTime departureAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "arrival_at")
     private OffsetDateTime arrivalAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "status")
     private TripStatus status;
 
     @ManyToOne

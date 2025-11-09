@@ -19,13 +19,15 @@ import java.util.Map;
 public class FareRule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "fare_rule_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "base_price")
     private BigDecimal basePrice;
 
     @Enumerated(EnumType.STRING)
-    private dinamyPricing dinamyPricing;
+    @Column(nullable = false, name = "dynamic_pricing")
+    private DynamicPricing dynamicPricing;
 
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
@@ -42,9 +44,4 @@ public class FareRule {
     @ManyToOne
     @JoinColumn(name = "to_stop_id", referencedColumnName = "stop_id")
     private Stop toStop;
-
-    public enum dinamyPricing{
-        ON,
-        OFF
-    }
 }

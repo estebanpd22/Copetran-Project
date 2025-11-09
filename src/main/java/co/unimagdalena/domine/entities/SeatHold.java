@@ -16,16 +16,17 @@ import java.time.OffsetDateTime;
 public class SeatHold {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "seat_hold_id")
     private Long id;
 
     @Column(name = "seat_number", nullable = false)
     private String seatNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "expire_at")
     private OffsetDateTime expiresAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "seat_hold_status")
     private SeatHoldStatus status;
 
     @OneToOne

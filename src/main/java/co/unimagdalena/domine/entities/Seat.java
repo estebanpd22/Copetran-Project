@@ -15,16 +15,17 @@ import java.math.BigDecimal;
 public class Seat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "seat_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "price")
     private BigDecimal price;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "number")
     private Integer number;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "type")
     private SeatType type;
 
     @Enumerated(EnumType.STRING)
