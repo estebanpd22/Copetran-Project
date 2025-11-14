@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface BaggageService {
 
-    Baggage createBaggage(PurchaseCreateRequest.BaggageRequest request, Ticket ticket);
+    Baggage createBaggage(BaggageCreateRequest request, Ticket ticket);
     BaggageResponse updateBaggage(Long id, BaggageUpdateRequest request);
     void deleteBaggage(Long id);
 

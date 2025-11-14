@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class StopDto {
     public record StopCreateRequest(
             @NotNull String name,
-            @NotNull Integer order,
+            @NotNull Integer stopOrder,
             @NotNull Double latitude,
             @NotNull Double longitude,
             @NotNull Long routeId
@@ -15,7 +15,7 @@ public class StopDto {
 
     public record StopUpdateRequest(
             String name,
-            Integer order,
+            Integer stopOrder,
             Double latitude,
             Double longitude,
             Long routeId
@@ -24,7 +24,7 @@ public class StopDto {
     public record StopResponse(
             Long id,
             String name,
-            Integer order,
+            Integer stopOrder,
             Double latitude,
             Double longitude
     ) implements Serializable {}
@@ -32,6 +32,6 @@ public class StopDto {
     public record StopSummary(
             Long id,
             String name,
-            Integer Order
+            Integer stopOrder
     ) implements Serializable {}
 }

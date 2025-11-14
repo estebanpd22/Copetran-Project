@@ -44,4 +44,9 @@ public class Purchase {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public void addTicket(Ticket ticket) {
+        tickets.add(ticket);
+        ticket.setPurchase(this);
+    }
 }

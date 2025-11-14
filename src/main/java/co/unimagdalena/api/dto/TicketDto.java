@@ -2,6 +2,7 @@ package co.unimagdalena.api.dto;
 
 import co.unimagdalena.domine.entities.PaymentMethod;
 import co.unimagdalena.domine.entities.TicketStatus;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -12,8 +13,10 @@ public class TicketDto {
     public record TicketCreateRequest(
             @NotNull BigDecimal price,
             @NotNull PaymentMethod paymentMethod,
+            @NotBlank String seatNumber,
             @NotNull Long tripId,
             @NotNull Long passengerId,
+            @NotNull Long purchaseId,
             @NotNull Long seatId,
             @NotNull Long fromStopId,
             @NotNull Long toStopId

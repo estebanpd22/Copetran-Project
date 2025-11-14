@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TicketService {
 
-    Ticket createTicket(PurchaseCreateRequest.TicketRequest request, Purchase purchase);
+    Ticket createTicket(PurchaseCreateRequest.TicketRequest req, Purchase purchase);
     TicketResponse getTicket(Long id);
     void deleteTicket(Long id);
 

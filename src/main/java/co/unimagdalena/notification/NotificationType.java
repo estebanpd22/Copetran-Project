@@ -1,4 +1,6 @@
 package co.unimagdalena.notification;
 
-public class NotificationType {
+public enum NotificationType {
+    WHATSAPP,
+    SMS
 }

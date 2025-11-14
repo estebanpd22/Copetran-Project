@@ -12,8 +12,6 @@ public interface PurchaseService {
 
     void cancelPurchase(Long purchaseId);
     void confirmPurchase(Long purchaseId, String paymentReference);
-    void reconcileOfflineSales();
-    void markAsFailed(Long purchaseId);
 
     List<PurchaseResponse> getPurchasesByUserId(Long userId);
     List<PurchaseResponse> getPurchasesByDateRange(OffsetDateTime start, OffsetDateTime end);

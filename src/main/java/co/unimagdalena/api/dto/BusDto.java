@@ -1,5 +1,6 @@
 package co.unimagdalena.api.dto;
 
+import co.unimagdalena.api.dto.AmenityDto.*;
 import co.unimagdalena.domine.entities.BusStatus;
 import co.unimagdalena.api.dto.SeatDto.*;
 import co.unimagdalena.api.dto.TripDto.*;
@@ -15,13 +16,14 @@ public class BusDto {
             @NotBlank String plate,
             @NotNull Integer capacity,
             @NotNull BusStatus status,
-            Set<AmenityDto> amenities
+            Set<AmenityCreateRequest> amenities
     ) implements Serializable {}
 
     public record BusUpdateRequest(
             Integer capacity,
             BusStatus status,
-            Set<AmenityDto> amenities
+            String plate,
+            Set<AmenityUpdateRequest> amenities
     ) implements Serializable {}
 
     public record BusResponse(
@@ -29,7 +31,7 @@ public class BusDto {
             String plate,
             Integer capacity,
             BusStatus status,
-            Set<AmenityDto> amenities,
+            Set<AmenityResponse> amenities,
             List<TripSummary> trips,
             List<SeatSummary> seats
     ) implements Serializable {}

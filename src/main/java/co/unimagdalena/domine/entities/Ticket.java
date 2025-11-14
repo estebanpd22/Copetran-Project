@@ -23,6 +23,9 @@ public class Ticket {
     @Column(nullable = false, name = "price")
     private BigDecimal price;
 
+    @Column(name = "seat_number", nullable = false)
+    private String seatNumber;
+
     @Column(nullable = false, name = "ticket_status")
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
@@ -37,6 +40,11 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "purchase_id")
     private Purchase purchase;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "passenger_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_ticket_passenger"))
+    private Passenger passenger;
 
     @ManyToOne
     @JoinColumn(name = "trip_id")

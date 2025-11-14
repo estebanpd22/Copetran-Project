@@ -9,7 +9,6 @@ public interface SeatHoldService {
     SeatHoldResponse createSeatHold(SeatHoldCreateRequest request);
     void releaseSeatHold(Long holdId);
 
-    void approveOverbookingHold(Long seatHoldId, Long dispatcherId);
     boolean hasOverlappingHold(Long tripId, String seatNumber, Integer fromStopOrder, Integer toStopOrder);
     boolean isSeatOnHold(Long tripId, String seatNumber);
     OffsetDateTime calculateExpirationTime();

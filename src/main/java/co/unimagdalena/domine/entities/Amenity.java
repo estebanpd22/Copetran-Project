@@ -18,4 +18,5 @@ public class Amenity {
 
     @Column(nullable = false, name = "name")
     private String name;
+
 }

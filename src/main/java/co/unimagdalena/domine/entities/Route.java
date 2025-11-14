@@ -61,5 +61,4 @@ public class Route {
         this.fareRules.add(fareRule);
         fareRule.setRoute(this);
     }
-
 }

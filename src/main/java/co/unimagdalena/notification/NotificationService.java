@@ -1,4 +1,9 @@
 package co.unimagdalena.notification;
 
-public class NotificationService {
+public interface NotificationService {
+    void send(NotificationRequest request);
+    NotificationType getType();
+    default boolean isEnabled() {
+        return true;
+    }
 }

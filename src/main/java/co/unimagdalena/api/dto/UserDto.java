@@ -3,6 +3,7 @@ package co.unimagdalena.api.dto;
 import co.unimagdalena.domine.entities.UserRole;
 import co.unimagdalena.domine.entities.UserStatus;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
@@ -34,6 +35,13 @@ public class UserDto {
             UserRole role,
             UserStatus status,
             LocalDateTime createdAt
+    ) implements Serializable {}
+
+    public record EmployeeCreateRequest(
+            @NotBlank @Email String email,
+            @NotBlank String name,
+            String phone,
+            @NotNull UserRole role
     ) implements Serializable {}
 
     public record UserSummary(

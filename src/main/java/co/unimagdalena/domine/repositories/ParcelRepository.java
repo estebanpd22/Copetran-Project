@@ -22,6 +22,10 @@ public interface ParcelRepository extends JpaRepository<Parcel,Long> {
     List<Parcel> findByReceiverNameIgnoringCase(String receiverName);
     List<Parcel> findByReceiverNameIgnoringCaseAndReceiverPhone(String receiverName, String receiverPhone);
     Optional<Parcel> findByDeliveryOTP(String deliveryOTP);
+    List<Parcel> findByTripId(Long tripId);
+    List<Parcel> findBySenderPhone(String senderPhone);
+    List<Parcel> findByReceiverPhone(String receiverPhone);
+
 
     @Query("""
         SELECT p FROM Parcel p
