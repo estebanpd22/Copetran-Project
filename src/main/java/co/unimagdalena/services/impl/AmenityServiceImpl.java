@@ -5,7 +5,7 @@ import co.unimagdalena.domine.entities.Amenity;
 import co.unimagdalena.domine.repositories.AmenityRepository;
 import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.services.mapper.AmenityMapper;
-import co.unimagdalena.services.mapper.AmenityService;
+import co.unimagdalena.services.AmenityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
