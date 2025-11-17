@@ -1,8 +1,6 @@
 package co.unimagdalena.services.mappers;
 
 import co.unimagdalena.api.dto.AssignmentDto;
-import co.unimagdalena.api.dto.TripDto;
-import co.unimagdalena.api.dto.UserDto;
 import co.unimagdalena.domine.entities.*;
 import co.unimagdalena.services.mapper.AssignmentMapper;
 import org.junit.jupiter.api.Test;
@@ -10,7 +8,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +26,7 @@ public class AssignmentMapperTest {
 
         Assignment assignment = mapper.toEntity(request);
 
-        assertThat(assignment.getAssignedAt()).isEqualTo(LocalDate.of(2025, 1, 15));
+        assertThat(assignment.getAssignedAt()).isEqualTo(LocalDateTime.of(2025, 1, 15,15,20));
     }
 
     @Test
@@ -86,6 +83,6 @@ public class AssignmentMapperTest {
 
         mapper.updateEntity(update, assignment);
 
-        assertThat(assignment.getAssignedAt()).isEqualTo(LocalDate.of(2025, 1, 20));
+        assertThat(assignment.getAssignedAt()).isEqualTo(updatedAssignedAt);
     }
 }

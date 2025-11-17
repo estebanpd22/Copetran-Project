@@ -71,6 +71,6 @@ public class IncidentMapperTest {
         assertThat(incident.getEntityType()).isEqualTo(EntityType.TRIP);
         assertThat(incident.getEntityId()).isEqualTo(2L);
         assertThat(incident.getIncidentType()).isEqualTo(IncidentType.OVERBOOK);
-        assertThat(incident.getNote()).isEqualTo("Traffic delay");
+        assertThat(incident.getNote()).isEqualTo("We were full");
     }
 }

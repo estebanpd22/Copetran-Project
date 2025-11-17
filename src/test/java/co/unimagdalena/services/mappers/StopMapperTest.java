@@ -82,6 +82,7 @@ public class StopMapperTest {
 
         mapper.updateEntity(update, stop);
 
+        assertThat(stop.getId()).isNotNull();
         assertThat(stop.getName()).isEqualTo("Main Terminal");
         assertThat(stop.getOrder()).isEqualTo(2);
         assertThat(stop.getLatitude()).isEqualTo(4.7110);

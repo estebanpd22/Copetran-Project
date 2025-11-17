@@ -15,13 +15,14 @@ public class TicketMapperTest {
 
     @Test
     void toEntity_shouldMapToCreate() {
+        Purchase purchase = Purchase.builder().id(1L).paymentMethod(PaymentMethod.CARD).build();
         TicketDto.TicketCreateRequest request = new TicketDto.TicketCreateRequest(
                 new BigDecimal("50.00"),
                 PaymentMethod.CARD,
                 "A15",
                 1L,
                 1L,
-                1L,
+                purchase.getId(),
                 1L,
                 1L,
                 2L
@@ -87,6 +88,7 @@ public class TicketMapperTest {
                 .id(1L)
                 .price(new BigDecimal("50.00"))
                 .status(TicketStatus.SOLD)
+                .purchase(Purchase.builder().id(2L).paymentMethod(PaymentMethod.CARD).build())
                 .build();
 
         TicketDto.TicketUpdateRequest update = new TicketDto.TicketUpdateRequest(
