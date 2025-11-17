@@ -5,12 +5,13 @@ import co.unimagdalena.api.dto.TripDto.*;
 import co.unimagdalena.api.dto.UserDto.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class AssignmentDto {
 
     public record AssignmentCreateRequest(
             @NotNull Boolean checkListOk,
-            @NotNull LocalDate assignedAt,
+            @NotNull LocalDateTime assignedAt,
             @NotNull Long tripId,
             @NotNull Long driverId,
             @NotNull Long dispatcherId
@@ -18,7 +19,7 @@ public class AssignmentDto {
 
     public record AssignmentUpdateRequest(
             Boolean checkListOk,
-            LocalDate assignedAt,
+            LocalDateTime assignedAt,
             Long tripId,
             Long driverId,
             Long dispatcherId
@@ -27,7 +28,7 @@ public class AssignmentDto {
     public record AssignmentResponse(
             Long id,
             Boolean checkListOk,
-            LocalDate assignedAt,
+            LocalDateTime assignedAt,
             TripSummary trip,
             UserSummary driver,
             UserSummary dispatcher
