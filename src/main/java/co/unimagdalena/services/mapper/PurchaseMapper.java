@@ -4,7 +4,7 @@ import co.unimagdalena.api.dto.PurchaseDto.*;
 import co.unimagdalena.domine.entities.Purchase;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {TicketMapper.class, UserMapper.class})
+@Mapper(componentModel = "spring")
 public interface PurchaseMapper {
 
     Purchase toEntity(PurchaseCreateRequest req);
