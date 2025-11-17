@@ -1,6 +1,7 @@
 package co.unimagdalena.api.dto;
 
 import co.unimagdalena.domine.entities.FareRule;
+import co.unimagdalena.domine.entities.DynamicPricing;
 import co.unimagdalena.api.dto.StopDto.*;
 import co.unimagdalena.api.dto.RouteDto.*;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +13,7 @@ public class FareRuleDto {
 
     public record FareRuleCreateRequest(
             @NotNull BigDecimal basePrice,
-            @NotNull FareRule.dinamyPricing dinamyPricing,
+            @NotNull DynamicPricing dynamicPricing,
             Map<String, Double> discounts,
             @NotNull Long routeId,
             @NotNull Long fromStopId,
@@ -21,7 +22,7 @@ public class FareRuleDto {
 
     public record FareRuleUpdateRequest(
             BigDecimal basePrice,
-            FareRule.dinamyPricing dinamyPricing,
+            DynamicPricing dynamicPricing,
             Map<String, Double> discounts,
             Long routeId,
             Long fromStopId,
@@ -31,7 +32,7 @@ public class FareRuleDto {
     public record FareRuleResponse(
             Long id,
             BigDecimal basePrice,
-            FareRule.dinamyPricing dinamyPricing,
+            DynamicPricing dynamicPricing,
             Map<String, Double> discounts,
             RouteSummary route,
             StopSummary fromStop,
