@@ -3,7 +3,7 @@ package co.unimagdalena.api.controllers;
 import co.unimagdalena.api.AmenityController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import co.unimagdalena.api.dto.AmenityDto.*;
-import co.unimagdalena.services.mapper.AmenityService;
+import co.unimagdalena.services.AmenityService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

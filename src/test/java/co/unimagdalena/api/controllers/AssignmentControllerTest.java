@@ -14,6 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -37,7 +38,7 @@ class AssignmentControllerTest {
                 OffsetDateTime.now().plusHours(2), co.unimagdalena.domine.entities.TripStatus.SCHEDULED, null);
         var driverSummary = new UserDto.UserSummary(1L, "John Driver", "driver@test.com", "1234567890");
         var dispatcherSummary = new UserDto.UserSummary(2L, "Jane Dispatcher", "dispatcher@test.com", "0987654321");
-        var resp = new AssignmentResponse(1L, true, LocalDate.now(), tripSummary, driverSummary, dispatcherSummary);
+        var resp = new AssignmentResponse(1L, true, LocalDateTime.now(), tripSummary, driverSummary, dispatcherSummary);
 
         when(service.assignDriverToTrip(1L, 1L)).thenReturn(resp);
 
@@ -55,7 +56,7 @@ class AssignmentControllerTest {
                 OffsetDateTime.now().plusHours(2), co.unimagdalena.domine.entities.TripStatus.SCHEDULED, null);
         var driverSummary = new UserDto.UserSummary(1L, "John Driver", "driver@test.com", "1234567890");
         var dispatcherSummary = new UserDto.UserSummary(2L, "Jane Dispatcher", "dispatcher@test.com", "0987654321");
-        var resp = new AssignmentResponse(1L, true, LocalDate.now(), tripSummary, driverSummary, dispatcherSummary);
+        var resp = new AssignmentResponse(1L, true, LocalDateTime.now(), tripSummary, driverSummary, dispatcherSummary);
 
         when(service.assignBusToTrip(1L, 1L)).thenReturn(resp);
 
@@ -68,7 +69,7 @@ class AssignmentControllerTest {
 
     @Test
     void update_shouldReturn204() throws Exception {
-        var req = new AssignmentUpdateRequest(false, LocalDate.now(), 1L, 1L, 2L);
+        var req = new AssignmentUpdateRequest(false, LocalDateTime.now(), 1L, 1L, 2L);
 
         mvc.perform(patch("/api/v1/assignments/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +93,7 @@ class AssignmentControllerTest {
                 OffsetDateTime.now().plusHours(2), co.unimagdalena.domine.entities.TripStatus.SCHEDULED, null);
         var driverSummary = new UserDto.UserSummary(1L, "John Driver", "driver@test.com", "1234567890");
         var dispatcherSummary = new UserDto.UserSummary(2L, "Jane Dispatcher", "dispatcher@test.com", "0987654321");
-        var resp = new AssignmentResponse(1L, true, LocalDate.now(), tripSummary, driverSummary, dispatcherSummary);
+        var resp = new AssignmentResponse(1L, true, LocalDateTime.now(), tripSummary, driverSummary, dispatcherSummary);
 
         when(service.getAssignment(1L)).thenReturn(resp);
 
@@ -107,7 +108,7 @@ class AssignmentControllerTest {
                 OffsetDateTime.now().plusHours(2), co.unimagdalena.domine.entities.TripStatus.SCHEDULED, null);
         var driverSummary = new UserDto.UserSummary(1L, "John Driver", "driver@test.com", "1234567890");
         var dispatcherSummary = new UserDto.UserSummary(2L, "Jane Dispatcher", "dispatcher@test.com", "0987654321");
-        var resp = new AssignmentResponse(1L, true, LocalDate.now(), tripSummary, driverSummary, dispatcherSummary);
+        var resp = new AssignmentResponse(1L, true, LocalDateTime.now(), tripSummary, driverSummary, dispatcherSummary);
 
         when(service.getAssignmentByTripId(1L)).thenReturn(resp);
 
@@ -119,8 +120,8 @@ class AssignmentControllerTest {
     @Test
     void getByDriver_shouldReturn200() throws Exception {
         var assignments = List.of(
-                new AssignmentResponse(1L, true, LocalDate.now(), null, null, null),
-                new AssignmentResponse(2L, true, LocalDate.now(), null, null, null)
+                new AssignmentResponse(1L, true, LocalDateTime.now(), null, null, null),
+                new AssignmentResponse(2L, true, LocalDateTime.now(), null, null, null)
         );
 
         when(service.getAssignmentByDriverId(1L)).thenReturn(assignments);
