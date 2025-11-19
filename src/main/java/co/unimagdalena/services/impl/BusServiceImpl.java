@@ -71,7 +71,7 @@ public class BusServiceImpl implements BusService {
         for (int row = 1; row <= rows; row++) {
             for (int col = 0; col < COLUMNS; col++) {
 
-                String seatNumber = row + String.valueOf(COLUMN_LETTERS[col]);
+                String seatNumber = row + "" + col;
                 SeatType type =
                         (row == 1) ? SeatType.PREFERENTIAL : SeatType.STANDARD;
 
