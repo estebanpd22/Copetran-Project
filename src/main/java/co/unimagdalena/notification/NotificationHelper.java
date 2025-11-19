@@ -87,7 +87,7 @@ public class NotificationHelper {
                 ticket.getSeatNumber()
         );
 
-        String phone = ticket.getPassenger().getPhoneNumber();
+        String phone = ticket.getPurchase().getUser().getPhone();
 
         NotificationRequest request = new NotificationRequest(phone, message, type);
         notificationFactory.send(request);
