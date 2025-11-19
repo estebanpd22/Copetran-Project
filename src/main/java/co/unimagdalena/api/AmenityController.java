@@ -1,7 +1,7 @@
 package co.unimagdalena.api;
 
 import co.unimagdalena.api.dto.AmenityDto.*;
-import co.unimagdalena.services.mapper.AmenityService;
+import co.unimagdalena.services.AmenityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

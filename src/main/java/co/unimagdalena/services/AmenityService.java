@@ -1,4 +1,4 @@
-package co.unimagdalena.services.mapper;
+package co.unimagdalena.services;
 
 import co.unimagdalena.api.dto.AmenityDto.*;
 
@@ -13,4 +13,3 @@ public interface AmenityService {
     AmenityResponse getAmenityById(Long id);
     List<AmenityResponse> getAllAmenities();
 }
-

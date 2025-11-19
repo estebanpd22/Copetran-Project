@@ -1,3 +1,4 @@
+
 package co.unimagdalena.services.mapper;
 
 import co.unimagdalena.api.dto.StopDto.*;
@@ -7,21 +8,16 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface StopMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "route", ignore = true)
-    @Mapping(target = "fareRulesFrom", ignore = true)
-    @Mapping(target = "fareRulesTo", ignore = true)
+    @Mapping(source= "stopOrder", target = "order")
     Stop toEntity(StopCreateRequest req);
 
+    @Mapping(target= "stopOrder", source = "order")
     StopResponse toResponse(Stop s);
 
-    @Mapping(source = "order", target = "Order")
+    @Mapping(target= "stopOrder", source = "order")
     StopSummary toSummary(Stop s);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "route", ignore = true)
-    @Mapping(target = "fareRulesFrom", ignore = true)
-    @Mapping(target = "fareRulesTo", ignore = true)
+    @Mapping(source= "stopOrder", target = "order")
     void updateEntity(StopUpdateRequest req, @MappingTarget Stop entity);
 }

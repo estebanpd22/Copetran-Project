@@ -1,7 +1,7 @@
 package co.unimagdalena.api.dto;
 
-import co.unimagdalena.domine.entities.FareRule;
 import co.unimagdalena.domine.entities.DynamicPricing;
+import co.unimagdalena.domine.entities.FareRule;
 import co.unimagdalena.api.dto.StopDto.*;
 import co.unimagdalena.api.dto.RouteDto.*;
 import jakarta.validation.constraints.NotNull;
