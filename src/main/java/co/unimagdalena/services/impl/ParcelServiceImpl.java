@@ -264,7 +264,7 @@ public class ParcelServiceImpl implements ParcelService {
         }
 
         // Validar OTP
-        if (!parcel.getDeliveryOTP().equals(otp) && parcelRepository.findById(parcelId).get().getId().equals(parcelId)) {
+        if (!parcel.getDeliveryOTP().equals(otp)) {
             markDeliveryFailed(parcelId, "OTP incorrecto");
             return;
         }
