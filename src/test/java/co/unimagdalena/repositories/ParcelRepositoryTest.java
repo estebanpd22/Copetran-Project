@@ -89,7 +89,7 @@ public class ParcelRepositoryTest extends AbstractRepositoryTI {
 
     @Test
     @DisplayName("Debe encontrar un parcel por ID")
-    void shouldFindParcelById() {
+    void shouldFindById() {
         // Given
         Route route = createRoute("R001", "Ruta 1", "Bogotá", "Medellín", 400.0f, 480.0f);
         Stop stop1 = createStop(route, "Terminal Bogotá", 1, 4.6097, -74.0817);
@@ -100,7 +100,7 @@ public class ParcelRepositoryTest extends AbstractRepositoryTI {
                 stop1, stop2, null, "123456");
 
         // When
-        Optional<Parcel> found = parcelRepository.findParcelById(parcel.getId());
+        Optional<Parcel> found = parcelRepository.findById(parcel.getId());
 
         // Then
         assertThat(found).isPresent();
