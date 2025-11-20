@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParcelRepository extends JpaRepository<Parcel,Long> {
-    Optional<Parcel> findParcelById(Long id);
+    Optional<Parcel> findById(Long id);
     Optional<Parcel> findByCode(String code);
     List<Parcel> findBySenderNameIgnoringCase(String senderName);
     List<Parcel> findBySenderNameIgnoreCaseAndSenderPhone(String senderName, String senderPhone);
