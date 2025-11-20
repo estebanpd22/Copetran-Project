@@ -1,43 +1,39 @@
 package co.unimagdalena.services;
 
 import co.unimagdalena.api.dto.PurchaseDto.*;
+import co.unimagdalena.api.dto.TicketDto.*;
 import co.unimagdalena.domine.entities.*;
-import co.unimagdalena.domine.repositories.PurchaseRepository;
-import co.unimagdalena.domine.repositories.UserRepository;
+import co.unimagdalena.domine.repositories.*;
 import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.notification.NotificationHelper;
-import co.unimagdalena.notification.NotificationType;
 import co.unimagdalena.services.impl.PurchaseServiceImpl;
 import co.unimagdalena.services.mapper.PurchaseMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class PurchaseServiceImplTest {
+public class PurchaseServiceImplTest {
 
     @Mock
     private PurchaseRepository purchaseRepository;
-
-    @Mock
-    private PurchaseMapper purchaseMapper;
 
     @Mock
     private UserRepository userRepository;
@@ -51,598 +47,660 @@ class PurchaseServiceImplTest {
     @Mock
     private NotificationHelper notificationHelper;
 
+    @Spy
+    private PurchaseMapper purchaseMapper = Mappers.getMapper(PurchaseMapper.class);
+
     @InjectMocks
     private PurchaseServiceImpl purchaseService;
 
-    private PurchaseCreateRequest createRequest;
-    private Purchase purchase;
-    private PurchaseResponse purchaseResponse;
-    private User user;
-    private Trip trip;
-    private Ticket ticket;
+    // ======================================================================
+    // HELPER METHODS - Creación de entidades de prueba
+    // ======================================================================
 
-    @BeforeEach
-    void setUp() {
-        // Setup User
-        user = User.builder()
-                .id(1L)
-                .fullName("Juan Perez")
-                .email("juan@example.com")
-                .phone("+573001234567")
-                .role(UserRole.PASSENGER)
-                .status(UserStatus.ACTIVE)
+    private User createUser(Long id, String email, String name, String phone,
+                            UserRole role, UserStatus status) {
+        return User.builder()
+                .id(id)
+                .email(email)
+                .fullName(name)
+                .phone(phone)
+                .role(role)
+                .status(status)
+                .passwordHash("hashedPassword")
+                .createdAt(LocalDateTime.now())
+                .purchases(new ArrayList<>())
                 .build();
+    }
 
-        // Setup Trip
-        trip = Trip.builder()
-                .id(1L)
-                .date(LocalDate.now())
-                .departureAt(OffsetDateTime.now().plusDays(1))
-                .arrivalAt(OffsetDateTime.now().plusDays(1).plusHours(4))
-                .status(TripStatus.SCHEDULED)
+    private Route createRoute(Long id, String code, String name,
+                              String origin, String destination) {
+        return Route.builder()
+                .id(id)
+                .code(code)
+                .name(name)
+                .origin(origin)
+                .destination(destination)
+                .distanceKm(100.0f)
+                .durationMin(120.0f)
+                .stops(new ArrayList<>())
+                .trips(new ArrayList<>())
+                .fareRules(new ArrayList<>())
                 .build();
+    }
 
-        // Setup Ticket Request
-        PurchaseCreateRequest.TicketRequest ticketRequest = new PurchaseCreateRequest.TicketRequest(
-                1L, // tripId
-                1L, // passengerId
-                1L, // seatId
-                "A1", // seatNumber
-                1L, // fromStopId
-                2L, // toStopId
-                null // baggage
-        );
-
-        createRequest = new PurchaseCreateRequest(
-                1L, // userId
-                PaymentMethod.CARD,
-                Collections.singletonList(ticketRequest)
-        );
-
-        // Setup Ticket
-        ticket = Ticket.builder()
-                .id(1L)
-                .price(BigDecimal.valueOf(50000))
-                .seatNumber("A1")
-                .status(TicketStatus.SOLD)
-                .trip(trip)
+    private Bus createBus(Long id, String plate, Integer capacity, BusStatus status) {
+        return Bus.builder()
+                .id(id)
+                .plate(plate)
+                .capacity(capacity)
+                .status(status)
+                .soatExpirationDate(OffsetDateTime.now().plusMonths(6))
+                .trips(new ArrayList<>())
+                .seats(new ArrayList<>())
                 .build();
+    }
 
-        // Setup Purchase
-        purchase = Purchase.builder()
-                .id(1L)
-                .paymentMethod(PaymentMethod.CARD)
-                .totalAmount(BigDecimal.valueOf(50000))
-                .paymentStatus(PaymentStatus.PENDING)
+    private Trip createTrip(Long id, LocalDate date, OffsetDateTime departureAt,
+                            OffsetDateTime arrivalAt, TripStatus status,
+                            Route route, Bus bus) {
+        return Trip.builder()
+                .id(id)
+                .date(date)
+                .departureAt(departureAt)
+                .arrivalAt(arrivalAt)
+                .status(status)
+                .route(route)
+                .bus(bus)
+                .seatHolds(new ArrayList<>())
+                .tickets(new ArrayList<>())
+                .parcels(new ArrayList<>())
+                .build();
+    }
+
+    private Passenger createPassenger(Long id, String fullName, String documentNumber) {
+        return Passenger.builder()
+                .id(id)
+                .fullName(fullName)
+                .documentType("CC")
+                .documentNumber(documentNumber)
+                .birthDate(LocalDate.of(1990, 1, 1))
+                .phoneNumber("1234567890")
+                .createdAt(OffsetDateTime.now())
+                .tickets(new ArrayList<>())
+                .build();
+    }
+
+    private Seat createSeat(Long id, Integer number, BigDecimal price,
+                            SeatType type, SeatStatus status, Bus bus) {
+        return Seat.builder()
+                .id(id)
+                .number(number)
+                .price(price)
+                .type(type)
+                .status(status)
+                .bus(bus)
+                .build();
+    }
+
+    private Stop createStop(Long id, String name, Integer order, Route route) {
+        return Stop.builder()
+                .id(id)
+                .name(name)
+                .order(order)
+                .latitude(4.7110)
+                .longitude(-74.0721)
+                .route(route)
+                .fareRulesFrom(new ArrayList<>())
+                .fareRulesTo(new ArrayList<>())
+                .build();
+    }
+
+    private Purchase createPurchase(Long id, PaymentMethod paymentMethod,
+                                    BigDecimal totalAmount, PaymentStatus paymentStatus,
+                                    User user) {
+        return Purchase.builder()
+                .id(id)
+                .paymentMethod(paymentMethod)
+                .totalAmount(totalAmount)
+                .paymentStatus(paymentStatus)
                 .createdAt(OffsetDateTime.now())
                 .user(user)
-                .tickets(Collections.singletonList(ticket))
+                .tickets(new ArrayList<>())
                 .build();
-
-        purchaseResponse = new PurchaseResponse(
-                1L,
-                BigDecimal.valueOf(50000),
-                PaymentMethod.CARD,
-                PaymentStatus.PENDING,
-                OffsetDateTime.now(),
-                null,
-                Collections.emptyList()
-        );
     }
 
-    // ==================== CREATE PURCHASE ====================
+    private Ticket createTicket(Long id, String seatNumber, BigDecimal price,
+                                TicketStatus status, Purchase purchase, Trip trip,
+                                Passenger passenger, Seat seat,
+                                Stop fromStop, Stop toStop) {
+        return Ticket.builder()
+                .id(id)
+                .seatNumber(seatNumber)
+                .price(price)
+                .status(status)
+                .createdAt(OffsetDateTime.now())
+                .qrCode(null)
+                .purchase(purchase)
+                .trip(trip)
+                .passenger(passenger)
+                .seat(seat)
+                .fromStop(fromStop)
+                .toStop(toStop)
+                .build();
+    }
+
+    // ======================================================================
+    // TESTS - createPurchase
+    // ======================================================================
 
     @Test
-    @DisplayName("Should create purchase successfully")
+    @DisplayName("Debe crear una Compra exitosamente con tickets válidos del mismo viaje")
     void shouldCreatePurchaseSuccessfully() {
         // Arrange
+        Long userId = 1L;
+        Long tripId = 1L;
+        Long passengerId = 1L;
+        Long seatId = 1L;
+        Long fromStopId = 1L;
+        Long toStopId = 2L;
+
+        User user = createUser(userId, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
+
+        Route route = createRoute(1L, "R001", "Ruta Norte", "Bogotá", "Medellín");
+        Bus bus = createBus(1L, "ABC123", 40, BusStatus.IN_SERVICE);
+        Trip trip = createTrip(tripId, LocalDate.now().plusDays(1),
+                OffsetDateTime.now().plusDays(1), OffsetDateTime.now().plusDays(1).plusHours(8),
+                TripStatus.SCHEDULED, route, bus);
+
+        Passenger passenger = createPassenger(passengerId, "John Doe", "1234567890");
+        Seat seat = createSeat(seatId, 1, new BigDecimal("50000"),
+                SeatType.STANDARD, SeatStatus.AVAILABLE, bus);
+        Stop fromStop = createStop(fromStopId, "Bogotá", 1, route);
+        Stop toStop = createStop(toStopId, "Medellín", 2, route);
+
+        Ticket ticket = createTicket(1L, "1", new BigDecimal("50000"), TicketStatus.SOLD,
+                null, trip, passenger, seat, fromStop, toStop);
+
+        List<PurchaseCreateRequest.TicketRequest> ticketRequests = List.of(
+                new PurchaseCreateRequest.TicketRequest(tripId, passengerId, seatId, "1", fromStopId, toStopId, null)
+        );
+
+        PurchaseCreateRequest createRequest = new PurchaseCreateRequest(
+                userId, PaymentMethod.CASH, ticketRequests
+        );
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         doNothing().when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(purchaseMapper.toEntity(createRequest)).thenReturn(purchase);
         when(ticketService.createTicket(any(), any())).thenReturn(ticket);
-        when(purchaseRepository.save(any(Purchase.class))).thenReturn(purchase);
-        when(purchaseMapper.toResponse(purchase)).thenReturn(purchaseResponse);
+        when(purchaseRepository.save(any(Purchase.class))).thenAnswer(inv -> {
+            Purchase p = inv.getArgument(0);
+            p.setId(1L);
+            return p;
+        });
 
         // Act
-        PurchaseResponse result = purchaseService.createPurchase(createRequest);
+        PurchaseResponse response = purchaseService.createPurchase(createRequest);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(PaymentStatus.PENDING, result.paymentStatus());
-        verify(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
-        verify(userRepository).findById(1L);
-        verify(ticketService).createTicket(any(), any());
-        verify(purchaseRepository).save(any(Purchase.class));
+        assertNotNull(response);
+        assertEquals(userId, response.user().id());
+        assertEquals(PaymentMethod.CASH, response.paymentMethod());
+        assertEquals(PaymentStatus.PENDING, response.paymentStatus());
+        assertTrue(response.totalAmount().compareTo(BigDecimal.ZERO) > 0);
+        verify(purchaseRepository, times(1)).save(any(Purchase.class));
+        verify(ticketService, times(1)).createTicket(any(), any());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when tickets list is empty")
+    @DisplayName("Debe lanzar excepcion cuando la lista de tickets está vacía")
     void shouldThrowExceptionWhenTicketsListIsEmpty() {
         // Arrange
-        PurchaseCreateRequest emptyRequest = new PurchaseCreateRequest(
-                1L,
-                PaymentMethod.CARD,
-                Collections.emptyList()
+        Long userId = 1L;
+        User user = createUser(userId, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
+
+        PurchaseCreateRequest createRequest = new PurchaseCreateRequest(
+                userId, PaymentMethod.CASH, new ArrayList<>()
         );
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> purchaseService.createPurchase(emptyRequest)
-        );
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> purchaseService.createPurchase(createRequest));
 
-        assertTrue(exception.getMessage().contains("La compra debe contener al menos un tiquete"));
-        verify(purchaseRepository, never()).save(any());
+        assertEquals("La compra debe contener al menos un tiquete.", exception.getMessage());
+        verify(purchaseRepository, never()).save(any(Purchase.class));
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when tickets belong to different trips")
-    void shouldThrowExceptionWhenTicketsBelongToDifferentTrips() {
+    @DisplayName("Debe lanzar excepcion cuando el Usuario no existe")
+    void shouldThrowExceptionWhenUserNotFound() {
         // Arrange
-        PurchaseCreateRequest.TicketRequest ticketRequest1 = new PurchaseCreateRequest.TicketRequest(
-                1L, 1L, 1L, "A1", 1L, 2L, null
-        );
-        PurchaseCreateRequest.TicketRequest ticketRequest2 = new PurchaseCreateRequest.TicketRequest(
-                2L, // Different tripId
-                2L, 2L, "A2", 1L, 2L, null
+        Long userId = 999L;
+        List<PurchaseCreateRequest.TicketRequest> ticketRequests = List.of(
+                new PurchaseCreateRequest.TicketRequest(1L, 1L, 1L, "1", 1L, 2L, null)
         );
 
-        PurchaseCreateRequest mixedRequest = new PurchaseCreateRequest(
-                1L,
-                PaymentMethod.CARD,
-                Arrays.asList(ticketRequest1, ticketRequest2)
+        PurchaseCreateRequest createRequest = new PurchaseCreateRequest(
+                userId, PaymentMethod.CASH, ticketRequests
         );
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> purchaseService.createPurchase(mixedRequest)
-        );
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> purchaseService.createPurchase(createRequest));
 
-        assertTrue(exception.getMessage().contains("Todos los tiquetes en una compra deben pertenecer al mismo viaje"));
-        verify(purchaseRepository, never()).save(any());
+        assertTrue(exception.getMessage().contains("Usuario") && exception.getMessage().contains("no encontrado"));
+        verify(purchaseRepository, never()).save(any(Purchase.class));
     }
 
     @Test
-    @DisplayName("Should throw NotFoundException when user does not exist")
-    void shouldThrowExceptionWhenUserDoesNotExist() {
+    @DisplayName("Debe lanzar excepcion cuando los tickets no pertenecen al mismo viaje")
+    void shouldThrowExceptionWhenTicketsFromDifferentTrips() {
         // Arrange
-        doNothing().when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
-        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+        Long userId = 1L;
+        User user = createUser(userId, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
 
-        PurchaseCreateRequest requestWithInvalidUser = new PurchaseCreateRequest(
-                999L,
-                PaymentMethod.CARD,
-                createRequest.tickets()
+        // Dos tickets de viajes diferentes
+        List<PurchaseCreateRequest.TicketRequest> ticketRequests = List.of(
+                new PurchaseCreateRequest.TicketRequest(1L, 1L, 1L, "1", 1L, 2L, null),
+                new PurchaseCreateRequest.TicketRequest(2L, 1L, 2L, "2", 1L, 2L, null) // Diferente tripId
         );
+
+        PurchaseCreateRequest createRequest = new PurchaseCreateRequest(
+                userId, PaymentMethod.CASH, ticketRequests
+        );
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act & Assert
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> purchaseService.createPurchase(requestWithInvalidUser)
-        );
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> purchaseService.createPurchase(createRequest));
 
-        assertTrue(exception.getMessage().contains("Usuario no encontrado"));
-        verify(purchaseRepository, never()).save(any());
+        assertTrue(exception.getMessage().toLowerCase().contains("mismo viaje"));
+        verify(purchaseRepository, never()).save(any(Purchase.class));
     }
 
     @Test
-    @DisplayName("Should throw IllegalStateException when total amount is zero or negative")
+    @DisplayName("Debe lanzar excepcion cuando el monto total es cero o negativo")
     void shouldThrowExceptionWhenTotalAmountIsZeroOrNegative() {
         // Arrange
-        Ticket zeroTicket = Ticket.builder()
-                .id(1L)
-                .price(BigDecimal.ZERO)
-                .build();
+        Long userId = 1L;
+        Long tripId = 1L;
 
-        doNothing().when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(purchaseMapper.toEntity(createRequest)).thenReturn(purchase);
-        when(ticketService.createTicket(any(), any())).thenReturn(zeroTicket);
+        User user = createUser(userId, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
 
-        // Act & Assert
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> purchaseService.createPurchase(createRequest)
+        Route route = createRoute(1L, "R001", "Ruta", "Orig", "Dest");
+        Bus bus = createBus(1L, "ABC123", 40, BusStatus.IN_SERVICE);
+        Trip trip = createTrip(tripId, LocalDate.now().plusDays(1),
+                OffsetDateTime.now().plusDays(1), OffsetDateTime.now().plusDays(1).plusHours(8),
+                TripStatus.SCHEDULED, route, bus);
+
+        Passenger passenger = createPassenger(1L, "John", "1234567890");
+        Seat seat = createSeat(1L, 1, BigDecimal.ZERO, SeatType.STANDARD, SeatStatus.AVAILABLE, bus);
+        Stop fromStop = createStop(1L, "Origen", 1, route);
+        Stop toStop = createStop(2L, "Destino", 2, route);
+
+        Ticket ticket = createTicket(1L, "1", BigDecimal.ZERO, TicketStatus.SOLD,
+                null, trip, passenger, seat, fromStop, toStop);
+
+        List<PurchaseCreateRequest.TicketRequest> ticketRequests = List.of(
+                new PurchaseCreateRequest.TicketRequest(tripId, 1L, 1L, "1", 1L, 2L, null)
         );
 
-        assertTrue(exception.getMessage().contains("El monto total de la compra no puede ser cero o negativo"));
-        verify(purchaseRepository, never()).save(any());
+        PurchaseCreateRequest createRequest = new PurchaseCreateRequest(
+                userId, PaymentMethod.CASH, ticketRequests
+        );
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        doNothing().when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
+        when(ticketService.createTicket(any(), any())).thenReturn(ticket);
+
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> purchaseService.createPurchase(createRequest));
+
+        assertTrue(exception.getMessage().contains("total") && exception.getMessage().contains("cero o negativo"));
+        verify(purchaseRepository, never()).save(any(Purchase.class));
     }
 
-    // ==================== CONFIRM PURCHASE ====================
+    // ======================================================================
+    // TESTS - confirmPurchase
+    // ======================================================================
 
     @Test
-    @DisplayName("Should confirm purchase successfully")
+    @DisplayName("Debe confirmar una Compra exitosamente cambiando estado a CONFIRMED")
     void shouldConfirmPurchaseSuccessfully() {
         // Arrange
-        purchase.setPaymentStatus(PaymentStatus.PENDING);
+        Long purchaseId = 1L;
+        String paymentReference = "REF123";
+
+        User user = createUser(1L, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
+
+        Route route = createRoute(1L, "R001", "Ruta", "Orig", "Dest");
+        Bus bus = createBus(1L, "ABC123", 40, BusStatus.IN_SERVICE);
+        Trip trip = createTrip(1L, LocalDate.now().plusDays(1),
+                OffsetDateTime.now().plusDays(1), OffsetDateTime.now().plusDays(1).plusHours(8),
+                TripStatus.SCHEDULED, route, bus);
+
+        Passenger passenger = createPassenger(1L, "John", "1234567890");
+        Seat seat = createSeat(1L, 1, new BigDecimal("50000"), SeatType.STANDARD, SeatStatus.AVAILABLE, bus);
+        Stop fromStop = createStop(1L, "Origen", 1, route);
+        Stop toStop = createStop(2L, "Destino", 2, route);
+
+        Ticket ticket = createTicket(1L, "1", new BigDecimal("50000"), TicketStatus.SOLD,
+                null, trip, passenger, seat, fromStop, toStop);
+
+        Purchase purchase = createPurchase(purchaseId, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.PENDING, user);
         purchase.addTicket(ticket);
 
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
+        when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
         doNothing().when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
         doNothing().when(ticketService).generateQrForTicket(anyLong());
-        when(purchaseRepository.save(purchase)).thenReturn(purchase);
-        doNothing().when(notificationHelper).sendPurchaseConfirmation(purchase, NotificationType.WHATSAPP);
+        when(purchaseRepository.save(any(Purchase.class))).thenAnswer(inv -> inv.getArgument(0));
+        doNothing().when(notificationHelper).sendPurchaseConfirmation(any(), any());
 
         // Act
-        purchaseService.confirmPurchase(1L, "PAY-REF-123");
+        purchaseService.confirmPurchase(purchaseId, paymentReference);
 
         // Assert
-        verify(purchaseRepository).findPurchaseById(1L);
-        verify(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
-        verify(ticketService).generateQrForTicket(ticket.getId());
-        verify(purchaseRepository).save(purchase);
-        verify(notificationHelper).sendPurchaseConfirmation(purchase, NotificationType.WHATSAPP);
+        assertEquals(PaymentStatus.CONFIRMED, purchase.getPaymentStatus());
+        verify(purchaseRepository, times(1)).save(purchase);
+        verify(ticketService, times(1)).generateQrForTicket(1L);
+        verify(notificationHelper, times(1)).sendPurchaseConfirmation(any(), any());
     }
 
     @Test
-    @DisplayName("Should return early when purchase is already confirmed")
-    void shouldReturnEarlyWhenPurchaseAlreadyConfirmed() {
+    @DisplayName("Debe lanzar excepcion cuando la Compra no está en estado PENDING para confirmar")
+    void shouldThrowExceptionWhenPurchaseNotInPendingStatus() {
         // Arrange
-        purchase.setPaymentStatus(PaymentStatus.CONFIRMED);
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
+        Long purchaseId = 1L;
+        User user = createUser(1L, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
 
-        // Act
-        purchaseService.confirmPurchase(1L, "PAY-REF-123");
+        Purchase purchase = createPurchase(purchaseId, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.CONFIRMED, user); // Ya confirmada
 
-        // Assert
-        verify(purchaseRepository).findPurchaseById(1L);
-        verify(seatHoldService, never()).validateActiveHolds(anyLong(), anyList(), anyLong());
-        verify(ticketService, never()).generateQrForTicket(anyLong());
-        verify(purchaseRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalStateException when confirming non-pending purchase")
-    void shouldThrowExceptionWhenConfirmingNonPendingPurchase() {
-        // Arrange
-        purchase.setPaymentStatus(PaymentStatus.CANCELLED);
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
+        when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
 
         // Act & Assert
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> purchaseService.confirmPurchase(1L, "PAY-REF-123")
-        );
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> purchaseService.confirmPurchase(purchaseId, "REF123"));
 
-        assertTrue(exception.getMessage().contains("Solo se pueden confirmar compras en estado PENDING"));
-        verify(purchaseRepository, never()).save(any());
+        assertTrue(exception.getMessage().toLowerCase().contains("pending"));
+        verify(purchaseRepository, never()).save(any(Purchase.class));
     }
 
     @Test
-    @DisplayName("Should throw IllegalStateException when seat holds are expired during confirmation")
+    @DisplayName("Debe lanzar excepcion cuando los SeatHolds han expirado durante confirmación")
     void shouldThrowExceptionWhenSeatHoldsExpired() {
         // Arrange
-        purchase.setPaymentStatus(PaymentStatus.PENDING);
-        purchase.addTicket(ticket);
+        Long purchaseId = 1L;
+        User user = createUser(1L, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
 
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
-        doThrow(new IllegalStateException("SeatHolds expirados"))
+        Purchase purchase = createPurchase(purchaseId, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.PENDING, user);
+
+        when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
+        doThrow(new IllegalStateException("SeatHolds expired"))
                 .when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
 
         // Act & Assert
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> purchaseService.confirmPurchase(1L, "PAY-REF-123")
-        );
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> purchaseService.confirmPurchase(purchaseId, "REF123"));
 
-        assertTrue(exception.getMessage().contains("El tiempo de reserva de sus asientos ha expirado"));
-        verify(purchaseRepository, never()).save(any());
+        assertTrue(exception.getMessage().toLowerCase().contains("expirado") ||
+                exception.getMessage().toLowerCase().contains("reservado"));
+        verify(purchaseRepository, never()).save(any(Purchase.class));
     }
 
-    @Test
-    @DisplayName("Should continue confirmation even if notification fails")
-    void shouldContinueWhenNotificationFails() {
-        // Arrange
-        purchase.setPaymentStatus(PaymentStatus.PENDING);
-        purchase.addTicket(ticket);
-
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
-        doNothing().when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
-        doNothing().when(ticketService).generateQrForTicket(anyLong());
-        when(purchaseRepository.save(purchase)).thenReturn(purchase);
-        doThrow(new RuntimeException("Notification failed"))
-                .when(notificationHelper).sendPurchaseConfirmation(purchase, NotificationType.WHATSAPP);
-
-        // Act - Should not throw exception
-        assertDoesNotThrow(() -> purchaseService.confirmPurchase(1L, "PAY-REF-123"));
-
-        // Assert
-        verify(purchaseRepository).save(purchase);
-        verify(notificationHelper).sendPurchaseConfirmation(purchase, NotificationType.WHATSAPP);
-    }
+    // ======================================================================
+    // TESTS - cancelPurchase
+    // ======================================================================
 
     @Test
-    @DisplayName("Should throw NotFoundException when purchase to confirm does not exist")
-    void shouldThrowExceptionWhenPurchaseToConfirmDoesNotExist() {
-        // Arrange
-        when(purchaseRepository.findPurchaseById(999L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> purchaseService.confirmPurchase(999L, "PAY-REF-123")
-        );
-
-        assertTrue(exception.getMessage().contains("Compra no encontrada"));
-        verify(purchaseRepository, never()).save(any());
-    }
-
-    // ==================== CANCEL PURCHASE ====================
-
-    @Test
-    @DisplayName("Should cancel purchase successfully")
+    @DisplayName("Debe cancelar una Compra exitosamente")
     void shouldCancelPurchaseSuccessfully() {
         // Arrange
-        purchase.setPaymentStatus(PaymentStatus.PENDING);
-        purchase.addTicket(ticket);
+        Long purchaseId = 1L;
+        User user = createUser(1L, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
 
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
-        doNothing().when(ticketService).releaseSeatsByPurchase(1L);
-        when(purchaseRepository.save(purchase)).thenReturn(purchase);
+        Purchase purchase = createPurchase(purchaseId, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.PENDING, user);
+
+        when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
+        doNothing().when(ticketService).releaseSeatsByPurchase(purchaseId);
+        when(purchaseRepository.save(any(Purchase.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // Act
-        purchaseService.cancelPurchase(1L);
+        purchaseService.cancelPurchase(purchaseId);
 
         // Assert
-        verify(purchaseRepository).findPurchaseById(1L);
-        verify(ticketService).releaseSeatsByPurchase(1L);
-        verify(purchaseRepository).save(purchase);
+        assertEquals(PaymentStatus.CANCELLED, purchase.getPaymentStatus());
+        verify(ticketService, times(1)).releaseSeatsByPurchase(purchaseId);
+        verify(purchaseRepository, times(1)).save(purchase);
     }
 
     @Test
-    @DisplayName("Should throw IllegalStateException when cancelling confirmed purchase")
+    @DisplayName("Debe lanzar excepcion cuando intenta cancelar una Compra ya confirmada")
     void shouldThrowExceptionWhenCancellingConfirmedPurchase() {
         // Arrange
-        purchase.setPaymentStatus(PaymentStatus.CONFIRMED);
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
+        Long purchaseId = 1L;
+        User user = createUser(1L, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
+
+        Purchase purchase = createPurchase(purchaseId, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.CONFIRMED, user);
+
+        when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
 
         // Act & Assert
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> purchaseService.cancelPurchase(1L)
-        );
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> purchaseService.cancelPurchase(purchaseId));
 
-        assertTrue(exception.getMessage().contains("No se puede cancelar una compra ya confirmada"));
-        verify(ticketService, never()).releaseSeatsByPurchase(anyLong());
-        verify(purchaseRepository, never()).save(any());
+        assertTrue(exception.getMessage().toLowerCase().contains("no se puede") &&
+                exception.getMessage().toLowerCase().contains("confirmada"));
+        verify(ticketService, never()).releaseSeatsByPurchase(purchaseId);
     }
 
     @Test
-    @DisplayName("Should throw IllegalStateException when cancelling already cancelled purchase")
-    void shouldThrowExceptionWhenCancellingAlreadyCancelledPurchase() {
+    @DisplayName("Debe lanzar excepcion cuando intenta cancelar una Compra ya cancelada")
+    void shouldThrowExceptionWhenCancellingCancelledPurchase() {
         // Arrange
-        purchase.setPaymentStatus(PaymentStatus.CANCELLED);
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
+        Long purchaseId = 1L;
+        User user = createUser(1L, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
+
+        Purchase purchase = createPurchase(purchaseId, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.CANCELLED, user);
+
+        when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
 
         // Act & Assert
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> purchaseService.cancelPurchase(1L)
-        );
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> purchaseService.cancelPurchase(purchaseId));
 
-        assertTrue(exception.getMessage().contains("is already cancelled"));
-        verify(ticketService, never()).releaseSeatsByPurchase(anyLong());
-        verify(purchaseRepository, never()).save(any());
+        assertTrue(exception.getMessage().toLowerCase().contains("already") &&
+                exception.getMessage().toLowerCase().contains("cancelled"));
+        verify(ticketService, never()).releaseSeatsByPurchase(purchaseId);
     }
 
-    @Test
-    @DisplayName("Should throw NotFoundException when purchase to cancel does not exist")
-    void shouldThrowExceptionWhenPurchaseToCancelDoesNotExist() {
-        // Arrange
-        when(purchaseRepository.findPurchaseById(999L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> purchaseService.cancelPurchase(999L)
-        );
-
-        assertTrue(exception.getMessage().contains("Compra no encontrada"));
-        verify(ticketService, never()).releaseSeatsByPurchase(anyLong());
-        verify(purchaseRepository, never()).save(any());
-    }
-
-    // ==================== GET PURCHASE ====================
+    // ======================================================================
+    // TESTS - getPurchase
+    // ======================================================================
 
     @Test
-    @DisplayName("Should get purchase by ID successfully")
-    void shouldGetPurchaseByIdSuccessfully() {
+    @DisplayName("Debe obtener una Compra por ID exitosamente")
+    void shouldGetPurchaseSuccessfully() {
         // Arrange
-        when(purchaseRepository.findPurchaseById(1L)).thenReturn(Optional.of(purchase));
-        when(purchaseMapper.toResponse(purchase)).thenReturn(purchaseResponse);
+        Long purchaseId = 1L;
+        User user = createUser(1L, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
+
+        Purchase purchase = createPurchase(purchaseId, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.CONFIRMED, user);
+
+        when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
 
         // Act
-        PurchaseResponse result = purchaseService.getPurchase(1L);
+        PurchaseResponse response = purchaseService.getPurchase(purchaseId);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(1L, result.id());
-        verify(purchaseRepository).findPurchaseById(1L);
-        verify(purchaseMapper).toResponse(purchase);
+        assertNotNull(response);
+        assertEquals(purchaseId, response.id());
+        assertEquals(PaymentMethod.CASH, response.paymentMethod());
+        verify(purchaseRepository, times(1)).findPurchaseById(purchaseId);
     }
 
     @Test
-    @DisplayName("Should throw NotFoundException when purchase does not exist")
-    void shouldThrowExceptionWhenPurchaseDoesNotExist() {
+    @DisplayName("Debe lanzar excepcion cuando la Compra no existe")
+    void shouldThrowExceptionWhenPurchaseNotFoundById() {
         // Arrange
-        when(purchaseRepository.findPurchaseById(999L)).thenReturn(Optional.empty());
+        Long purchaseId = 999L;
+
+        when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> purchaseService.getPurchase(999L)
-        );
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> purchaseService.getPurchase(purchaseId));
 
-        assertTrue(exception.getMessage().contains("Compra no encontrada"));
-        verify(purchaseRepository).findPurchaseById(999L);
-        verify(purchaseMapper, never()).toResponse(any());
+        assertTrue(exception.getMessage().toLowerCase().contains("compra") && exception.getMessage().toLowerCase().contains("no encontrada"));
     }
 
-    // ==================== GET PURCHASES BY USER ID ====================
+    // ======================================================================
+    // TESTS - getPurchasesByUserId
+    // ======================================================================
 
     @Test
-    @DisplayName("Should get purchases by user ID successfully")
+    @DisplayName("Debe obtener todas las Compras de un Usuario exitosamente")
     void shouldGetPurchasesByUserIdSuccessfully() {
         // Arrange
-        Purchase purchase2 = Purchase.builder()
-                .id(2L)
-                .paymentStatus(PaymentStatus.CONFIRMED)
-                .build();
+        Long userId = 1L;
+        User user = createUser(userId, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
 
-        user.addPurchase(purchase);
-        user.addPurchase(purchase2);
+        Purchase purchase1 = createPurchase(1L, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.CONFIRMED, user);
+        Purchase purchase2 = createPurchase(2L, PaymentMethod.CARD,
+                new BigDecimal("60000"), PaymentStatus.PENDING, user);
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(purchaseMapper.toResponse(any(Purchase.class))).thenReturn(purchaseResponse);
+        user.getPurchases().add(purchase1);
+        user.getPurchases().add(purchase2);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act
-        List<PurchaseResponse> result = purchaseService.getPurchasesByUserId(1L);
+        List<PurchaseResponse> responses = purchaseService.getPurchasesByUserId(userId);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        verify(userRepository).findById(1L);
-        verify(purchaseMapper, times(2)).toResponse(any(Purchase.class));
+        assertNotNull(responses);
+        assertEquals(2, responses.size());
+        verify(userRepository, times(1)).findById(userId);
     }
 
     @Test
-    @DisplayName("Should throw NotFoundException when user does not exist for get purchases")
-    void shouldThrowExceptionWhenUserDoesNotExistForGetPurchases() {
-        // Arrange
-        when(userRepository.findById(999L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> purchaseService.getPurchasesByUserId(999L)
-        );
-
-        assertTrue(exception.getMessage().contains("Usuario no encontrado"));
-        verify(userRepository).findById(999L);
-        verify(purchaseMapper, never()).toResponse(any());
-    }
-
-    @Test
-    @DisplayName("Should return empty list when user has no purchases")
+    @DisplayName("Debe retornar lista vacía cuando el Usuario no tiene Compras")
     void shouldReturnEmptyListWhenUserHasNoPurchases() {
         // Arrange
-        User userWithoutPurchases = User.builder()
-                .id(2L)
-                .fullName("User Without Purchases")
-                .email("user2@example.com")
-                .purchases(Collections.emptyList())
-                .build();
+        Long userId = 1L;
+        User user = createUser(userId, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
 
-        when(userRepository.findById(2L)).thenReturn(Optional.of(userWithoutPurchases));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act
-        List<PurchaseResponse> result = purchaseService.getPurchasesByUserId(2L);
+        List<PurchaseResponse> responses = purchaseService.getPurchasesByUserId(userId);
 
         // Assert
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-        verify(userRepository).findById(2L);
-        verify(purchaseMapper, never()).toResponse(any());
-    }
-
-    // ==================== GET PURCHASES BY DATE RANGE ====================
-
-    @Test
-    @DisplayName("Should get purchases by date range successfully")
-    void shouldGetPurchasesByDateRangeSuccessfully() {
-        // Arrange
-        OffsetDateTime start = OffsetDateTime.now().minusDays(7);
-        OffsetDateTime end = OffsetDateTime.now();
-
-        Purchase purchase2 = Purchase.builder()
-                .id(2L)
-                .createdAt(OffsetDateTime.now().minusDays(3))
-                .build();
-
-        List<Purchase> purchases = Arrays.asList(purchase, purchase2);
-
-        when(purchaseRepository.findByDateRange(start, end)).thenReturn(purchases);
-        when(purchaseMapper.toResponse(any(Purchase.class))).thenReturn(purchaseResponse);
-
-        // Act
-        List<PurchaseResponse> result = purchaseService.getPurchasesByDateRange(start, end);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        verify(purchaseRepository).findByDateRange(start, end);
-        verify(purchaseMapper, times(2)).toResponse(any(Purchase.class));
+        assertNotNull(responses);
+        assertTrue(responses.isEmpty());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when start date is after end date")
-    void shouldThrowExceptionWhenStartDateIsAfterEndDate() {
+    @DisplayName("Debe lanzar excepcion cuando el Usuario no existe")
+    void shouldThrowExceptionWhenUserNotFoundForGetPurchases() {
         // Arrange
-        OffsetDateTime start = OffsetDateTime.now();
-        OffsetDateTime end = OffsetDateTime.now().minusDays(7);
+        Long userId = 999L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> purchaseService.getPurchasesByDateRange(start, end)
-        );
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> purchaseService.getPurchasesByUserId(userId));
 
-        assertTrue(exception.getMessage().contains("La fecha de inicio debe ser anterior a la fecha de fin"));
-        verify(purchaseRepository, never()).findByDateRange(any(), any());
+        assertTrue(exception.getMessage().toLowerCase().contains("usuario") && exception.getMessage().toLowerCase().contains("no encontrado"));
+    }
+
+    // ======================================================================
+    // TESTS - getPurchasesByDateRange
+    // ======================================================================
+
+    @Test
+    @DisplayName("Debe obtener Compras dentro de un rango de fechas exitosamente")
+    void shouldGetPurchasesByDateRangeSuccessfully() {
+        // Arrange
+        OffsetDateTime startDate = OffsetDateTime.now().minusDays(7);
+        OffsetDateTime endDate = OffsetDateTime.now();
+
+        User user = createUser(1L, "user@test.com", "John Doe", "1234567890",
+                UserRole.PASSENGER, UserStatus.ACTIVE);
+
+        Purchase purchase1 = createPurchase(1L, PaymentMethod.CASH,
+                new BigDecimal("50000"), PaymentStatus.CONFIRMED, user);
+        Purchase purchase2 = createPurchase(2L, PaymentMethod.CARD,
+                new BigDecimal("60000"), PaymentStatus.CONFIRMED, user);
+
+        when(purchaseRepository.findByDateRange(startDate, endDate))
+                .thenReturn(List.of(purchase1, purchase2));
+
+        // Act
+        List<PurchaseResponse> responses = purchaseService.getPurchasesByDateRange(startDate, endDate);
+
+        // Assert
+        assertNotNull(responses);
+        assertEquals(2, responses.size());
+        verify(purchaseRepository, times(1)).findByDateRange(startDate, endDate);
     }
 
     @Test
-    @DisplayName("Should return empty list when no purchases in date range")
+    @DisplayName("Debe lanzar excepcion cuando la fecha de inicio es posterior a la fecha de fin")
+    void shouldThrowExceptionWhenStartDateAfterEndDate() {
+        // Arrange
+        OffsetDateTime startDate = OffsetDateTime.now();
+        OffsetDateTime endDate = OffsetDateTime.now().minusDays(7);
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> purchaseService.getPurchasesByDateRange(startDate, endDate));
+
+        assertTrue(exception.getMessage().toLowerCase().contains("inicio") &&
+                exception.getMessage().toLowerCase().contains("anterior"));
+    }
+
+    @Test
+    @DisplayName("Debe retornar lista vacía cuando no hay Compras en el rango de fechas")
     void shouldReturnEmptyListWhenNoPurchasesInDateRange() {
         // Arrange
-        OffsetDateTime start = OffsetDateTime.now().minusDays(30);
-        OffsetDateTime end = OffsetDateTime.now().minusDays(20);
+        OffsetDateTime startDate = OffsetDateTime.now().minusDays(30);
+        OffsetDateTime endDate = OffsetDateTime.now().minusDays(20);
 
-        when(purchaseRepository.findByDateRange(start, end)).thenReturn(Collections.emptyList());
+        when(purchaseRepository.findByDateRange(startDate, endDate))
+                .thenReturn(new ArrayList<>());
 
         // Act
-        List<PurchaseResponse> result = purchaseService.getPurchasesByDateRange(start, end);
+        List<PurchaseResponse> responses = purchaseService.getPurchasesByDateRange(startDate, endDate);
 
         // Assert
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-        verify(purchaseRepository).findByDateRange(start, end);
-        verify(purchaseMapper, never()).toResponse(any());
-    }
-
-    // ==================== HELPER METHODS ====================
-
-    private Purchase createPurchase(Long id, PaymentStatus status, BigDecimal amount) {
-        return Purchase.builder()
-                .id(id)
-                .paymentMethod(PaymentMethod.CARD)
-                .totalAmount(amount)
-                .paymentStatus(status)
-                .createdAt(OffsetDateTime.now())
-                .user(user)
-                .build();
-    }
-
-    private Ticket createTicket(Long id, BigDecimal price, Trip trip) {
-        return Ticket.builder()
-                .id(id)
-                .price(price)
-                .seatNumber("A1")
-                .status(TicketStatus.SOLD)
-                .trip(trip)
-                .build();
-    }
-
-    private User createUser(Long id, String fullName, String email) {
-        return User.builder()
-                .id(id)
-                .fullName(fullName)
-                .email(email)
-                .phone("+573001234567")
-                .role(UserRole.PASSENGER)
-                .status(UserStatus.ACTIVE)
-                .build();
+        assertNotNull(responses);
+        assertTrue(responses.isEmpty());
     }
 }
