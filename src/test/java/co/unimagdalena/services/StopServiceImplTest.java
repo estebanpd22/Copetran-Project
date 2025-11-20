@@ -5,6 +5,7 @@ import co.unimagdalena.domine.entities.Route;
 import co.unimagdalena.domine.entities.Stop;
 import co.unimagdalena.domine.entities.FareRule;
 import co.unimagdalena.domine.repositories.StopRepository;
+import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.services.impl.StopServiceImpl;
 import co.unimagdalena.services.mapper.StopMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -145,8 +146,8 @@ class StopServiceImplTest {
         when(stopRepository.findStopById(stopId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> stopService.getStopById(stopId),
-                "Debe lanzar IllegalArgumentException cuando la parada no existe");
+        assertThrows(NotFoundException.class, () -> stopService.getStopById(stopId),
+                "Debe lanzar NotFoundException cuando la parada no existe");
         verify(stopRepository, times(1)).findStopById(stopId);
         verify(stopMapper, never()).toResponse(any());
     }
@@ -186,8 +187,8 @@ class StopServiceImplTest {
         when(stopRepository.findStopById(stopId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> stopService.updateStop(stopId, updateRequest),
-                "Debe lanzar IllegalArgumentException cuando la parada no existe");
+        assertThrows(NotFoundException.class, () -> stopService.updateStop(stopId, updateRequest),
+                "Debe lanzar NotFoundException cuando la parada no existe");
         verify(stopRepository, times(1)).findStopById(stopId);
         verify(stopMapper, never()).updateEntity(any(), any());
     }
@@ -283,8 +284,8 @@ class StopServiceImplTest {
         when(stopRepository.findStopById(stopId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> stopService.deleteStop(stopId),
-                "Debe lanzar IllegalArgumentException cuando la parada no existe");
+        assertThrows(NotFoundException.class, () -> stopService.deleteStop(stopId),
+                "Debe lanzar NotFoundException cuando la parada no existe");
         verify(stopRepository, never()).delete(any());
     }
 

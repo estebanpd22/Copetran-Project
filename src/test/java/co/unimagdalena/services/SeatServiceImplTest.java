@@ -204,8 +204,6 @@ class SeatServiceImplTest {
         );
 
         when(seatRepository.findById(1L)).thenReturn(Optional.of(existingSeat));
-        when(seatRepository.findByBusIdAndNumber(existingSeat.getBus().getId(), 1))
-                .thenReturn(Optional.empty());
         when(seatRepository.save(any(Seat.class))).thenReturn(updatedSeat);
         when(seatMapper.toResponse(updatedSeat)).thenReturn(response);
 

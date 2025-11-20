@@ -20,10 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -180,7 +177,7 @@ class PassengerServiceImplTest {
         // Arrange
         when(passengerRepository.existsByDocumentNumber(createRequest.documentNumber())).thenReturn(false);
         when(passengerMapper.toEntity(createRequest)).thenReturn(passenger);
-        when(userRepository.findById(createRequest.userId())).thenReturn(Optional.empty());
+        when(userRepository.findUserById(createRequest.userId())).thenReturn(Optional.empty());
 
         // Act & Assert
         NotFoundException exception = assertThrows(
@@ -199,7 +196,7 @@ class PassengerServiceImplTest {
     @DisplayName("Should update passenger successfully")
     void shouldUpdatePassengerSuccessfully() {
         // Arrange
-        when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
+        when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
         doNothing().when(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
         when(passengerRepository.save(passenger)).thenReturn(passenger);
 
@@ -207,7 +204,7 @@ class PassengerServiceImplTest {
         passengerService.updatePassenger(1L, updateRequest);
 
         // Assert
-        verify(passengerRepository).findById(1L);
+        verify(passengerRepository).findPassengerById(1L);
         verify(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
         verify(passengerRepository).save(passenger);
     }
@@ -216,7 +213,7 @@ class PassengerServiceImplTest {
     @DisplayName("Should throw NotFoundException when passenger to update does not exist")
     void shouldThrowExceptionWhenPassengerToUpdateDoesNotExist() {
         // Arrange
-        when(passengerRepository.findById(999L)).thenReturn(Optional.empty());
+        when(passengerRepository.findPassengerById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
         NotFoundException exception = assertThrows(
@@ -226,7 +223,7 @@ class PassengerServiceImplTest {
 
         assertTrue(exception.getMessage().contains("Pasajero con ID"));
         assertTrue(exception.getMessage().contains("no encontrado"));
-        verify(passengerRepository).findById(999L);
+        verify(passengerRepository).findPassengerById(999L);
         verify(passengerRepository, never()).save(any());
     }
 
@@ -240,7 +237,7 @@ class PassengerServiceImplTest {
                 .email("newuser@example.com")
                 .build();
 
-        when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
+        when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
         when(userRepository.findById(2L)).thenReturn(Optional.of(newUser));
         doNothing().when(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
         when(passengerRepository.save(passenger)).thenReturn(passenger);
@@ -249,8 +246,8 @@ class PassengerServiceImplTest {
         passengerService.updatePassenger(1L, updateRequest);
 
         // Assert
-        verify(passengerRepository).findById(1L);
-        verify(userRepository).findById(2L);
+        verify(passengerRepository).findPassengerById(1L);
+        verify(userRepository).findUserById(2L);
         verify(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
         verify(passengerRepository).save(passenger);
     }
@@ -259,7 +256,7 @@ class PassengerServiceImplTest {
     @DisplayName("Should throw NotFoundException when new user does not exist during update")
     void shouldThrowExceptionWhenNewUserDoesNotExist() {
         // Arrange
-        when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
+        when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         doNothing().when(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
 
@@ -287,7 +284,7 @@ class PassengerServiceImplTest {
                 "+573009876543"
         );
 
-        when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
+        when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
         doNothing().when(passengerMapper).updateEntityFromRequest(requestWithoutUser, passenger);
         when(passengerRepository.save(passenger)).thenReturn(passenger);
 
@@ -295,7 +292,7 @@ class PassengerServiceImplTest {
         passengerService.updatePassenger(1L, requestWithoutUser);
 
         // Assert
-        verify(passengerRepository).findById(1L);
+        verify(passengerRepository).findPassengerById(1L);
         verify(userRepository, never()).findById(any());
         verify(passengerMapper).updateEntityFromRequest(requestWithoutUser, passenger);
         verify(passengerRepository).save(passenger);
@@ -314,7 +311,7 @@ class PassengerServiceImplTest {
                 "+573009876543"
         );
 
-        when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
+        when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
         doNothing().when(passengerMapper).updateEntityFromRequest(sameUserRequest, passenger);
         when(passengerRepository.save(passenger)).thenReturn(passenger);
 
@@ -322,7 +319,7 @@ class PassengerServiceImplTest {
         passengerService.updatePassenger(1L, sameUserRequest);
 
         // Assert
-        verify(passengerRepository).findById(1L);
+        verify(passengerRepository).findPassengerById(1L);
         verify(userRepository, never()).findById(any());
         verify(passengerRepository).save(passenger);
     }
@@ -458,7 +455,7 @@ class PassengerServiceImplTest {
     @DisplayName("Should get passenger by ID successfully")
     void shouldGetPassengerByIdSuccessfully() {
         // Arrange
-        when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
+        when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
         when(passengerMapper.toResponse(passenger)).thenReturn(passengerResponse);
 
         // Act
@@ -467,7 +464,7 @@ class PassengerServiceImplTest {
         // Assert
         assertNotNull(result);
         assertEquals(1L, result.id());
-        verify(passengerRepository).findById(1L);
+        verify(passengerRepository).findPassengerById(1L);
         verify(passengerMapper).toResponse(passenger);
     }
 
@@ -475,7 +472,7 @@ class PassengerServiceImplTest {
     @DisplayName("Should throw NotFoundException when passenger by ID does not exist")
     void shouldThrowExceptionWhenPassengerByIdNotFound() {
         // Arrange
-        when(passengerRepository.findById(999L)).thenReturn(Optional.empty());
+        when(passengerRepository.findPassengerById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
         NotFoundException exception = assertThrows(
@@ -485,7 +482,7 @@ class PassengerServiceImplTest {
 
         assertTrue(exception.getMessage().contains("Pasajero con ID"));
         assertTrue(exception.getMessage().contains("no encontrado"));
-        verify(passengerRepository).findById(999L);
+        verify(passengerRepository).findPassengerById(999L);
         verify(passengerMapper, never()).toResponse(any());
     }
 

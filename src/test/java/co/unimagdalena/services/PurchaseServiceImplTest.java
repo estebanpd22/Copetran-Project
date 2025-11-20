@@ -8,6 +8,8 @@ import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.notification.NotificationHelper;
 import co.unimagdalena.services.impl.PurchaseServiceImpl;
 import co.unimagdalena.services.mapper.PurchaseMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.message.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +25,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.logging.Logger;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -264,8 +268,6 @@ public class PurchaseServiceImplTest {
                 userId, PaymentMethod.CASH, new ArrayList<>()
         );
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> purchaseService.createPurchase(createRequest));
@@ -315,7 +317,6 @@ public class PurchaseServiceImplTest {
                 userId, PaymentMethod.CASH, ticketRequests
         );
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -434,7 +435,7 @@ public class PurchaseServiceImplTest {
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> purchaseService.confirmPurchase(purchaseId, "REF123"));
 
-        assertTrue(exception.getMessage().toLowerCase().contains("pending"));
+        assertTrue(exception.getMessage().toLowerCase().contains("re-confirmar"));
         verify(purchaseRepository, never()).save(any(Purchase.class));
     }
 
@@ -450,8 +451,6 @@ public class PurchaseServiceImplTest {
                 new BigDecimal("50000"), PaymentStatus.PENDING, user);
 
         when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
-        doThrow(new IllegalStateException("SeatHolds expired"))
-                .when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
 
         // Act & Assert
         IllegalStateException exception = assertThrows(IllegalStateException.class,
