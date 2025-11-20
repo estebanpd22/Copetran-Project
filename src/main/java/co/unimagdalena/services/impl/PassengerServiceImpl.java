@@ -45,7 +45,7 @@ public class PassengerServiceImpl implements PassengerService {
         // 2. Lógica de Servicio: Asociar usuario (manejando "invitados")
         if (request.userId() != null) {
             log.debug("Asociando pasajero con User ID: {}", request.userId());
-            User user = userRepository.findById(request.userId())
+            User user = userRepository.findUserById(request.userId())
                     .orElseThrow(() -> {
                         log.error("Usuario con ID {} no encontrado al crear pasajero", request.userId());
                         return new NotFoundException(String.format("Usuario con ID %d no encontrado", request.userId()));
@@ -66,7 +66,7 @@ public class PassengerServiceImpl implements PassengerService {
     @Transactional
     public void updatePassenger(Long id, PassengerUpdateRequest request) {
         // 1. Obtener Entidad
-        Passenger passenger = repository.findById(id).orElseThrow(() -> {
+        Passenger passenger = repository.findPassengerById(id).orElseThrow(() -> {
             log.error("Pasajero no encontrado para actualizar. ID: {}", id);
             return new NotFoundException(String.format("Pasajero con ID %d no encontrado", id));
         });
@@ -77,7 +77,7 @@ public class PassengerServiceImpl implements PassengerService {
         // 3. Lógica de Servicio: Re-asociar usuario
         if (request.userId() != null && (passenger.getUser() == null || !request.userId().equals(passenger.getUser().getId()))) {
             log.debug("Re-asociando pasajero ID {} con nuevo User ID {}", id, request.userId());
-            User newUser = userRepository.findById(request.userId())
+            User newUser = userRepository.findUserById(request.userId())
                     .orElseThrow(() -> new NotFoundException(String.format("Usuario con ID %d no encontrado", request.userId())));
             passenger.setUser(newUser);
         }
@@ -122,7 +122,7 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     @Transactional(readOnly = true)
     public PassengerResponse getPassengerById(Long id) {
-        Passenger passenger = repository.findById(id)
+        Passenger passenger = repository.findPassengerById(id)
                 .orElseThrow(() -> {
                     log.warn("Pasajero no encontrado por ID: {}", id);
                     return new NotFoundException(String.format("Pasajero con ID %d no encontrado", id));

@@ -131,7 +131,7 @@ public class FareRuleServiceImpl implements FareRuleService {
         BigDecimal basePrice = rule.getBasePrice();
 
         // 2. Obtener pasajero y calcular descuento según edad
-        Passenger passenger = passengerRepository.findById(passengerId)
+        Passenger passenger = passengerRepository.findPassengerById(passengerId)
                 .orElseThrow(() -> new NotFoundException("Pasajero no encontrado con ID: " + passengerId));
 
         BigDecimal ageDiscount = calculateAgeDiscount(passenger.getBirthDate(), rule);

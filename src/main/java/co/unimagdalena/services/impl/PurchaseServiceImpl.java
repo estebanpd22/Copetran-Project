@@ -94,8 +94,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         // ESTADO CORREGIDO: Validamos contra CONFIRMED
         if (purchase.getPaymentStatus() == PaymentStatus.CONFIRMED) {
-            log.warn("Intento de re-confirmar compra ya confirmada: {}", purchaseId);
-            return;
+            throw new IllegalStateException("Intento de re-confirmar compra ya confirmada");
         }
 
         if (purchase.getPaymentStatus() != PaymentStatus.PENDING) {
@@ -105,7 +104,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         // 1. Validación Defensiva: Verificar que Holds sigan activos
         try {
             seatHoldService.validateActiveHolds(
-                    purchase.getTickets().get(0).getTrip().getId(), // 1. ID del Viaje
+                    purchase.getTickets().getFirst().getTrip().getId(), // 1. ID del Viaje
                     purchase.getTickets().stream().map(Ticket::getSeatNumber).toList(), // 2. Lista de asientos
                     purchase.getUser().getId() // 3. ID del Usuario
             );

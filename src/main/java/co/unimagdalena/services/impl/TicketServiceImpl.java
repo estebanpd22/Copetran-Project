@@ -4,9 +4,9 @@ import co.unimagdalena.api.dto.PurchaseDto.*;
 import co.unimagdalena.api.dto.TicketDto.*;
 import co.unimagdalena.domine.entities.*;
 import co.unimagdalena.domine.repositories.*;
+import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.services.TicketService;
 import co.unimagdalena.services.mapper.TicketMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,31 +40,31 @@ public class TicketServiceImpl implements TicketService {
         Trip trip = tripRepository.findById(request.tripId())
                 .orElseThrow(() -> {
                     log.error("Trip not found with ID: {}", request.tripId());
-                    return new EntityNotFoundException("Trip with ID " + request.tripId() + " not found");
+                    return new NotFoundException("Trip with ID " + request.tripId() + " not found");
                 });
 
-        Passenger passenger = passengerRepository.findById(request.passengerId())
+        Passenger passenger = passengerRepository.findPassengerById(request.passengerId())
                 .orElseThrow(() -> {
                     log.error("Passenger not found with ID: {}", request.passengerId());
-                    return new EntityNotFoundException("Passenger with ID " + request.passengerId() + " not found");
+                    return new NotFoundException("Passenger with ID " + request.passengerId() + " not found");
                 });
 
         Seat seat = seatRepository.findById(request.seatId())
                 .orElseThrow(() -> {
                     log.error("Seat not found with ID: {}", request.seatId());
-                    return new EntityNotFoundException("Seat with ID " + request.seatId() + " not found");
+                    return new NotFoundException("Seat with ID " + request.seatId() + " not found");
                 });
 
-        Stop fromStop = stopRepository.findById(request.fromStopId())
+        Stop fromStop = stopRepository.findStopById(request.fromStopId())
                 .orElseThrow(() -> {
                     log.error("Origin stop not found with ID: {}", request.fromStopId());
-                    return new EntityNotFoundException("Stop with ID " + request.fromStopId() + " not found");
+                    return new NotFoundException("Stop with ID " + request.fromStopId() + " not found");
                 });
 
-        Stop toStop = stopRepository.findById(request.toStopId())
+        Stop toStop = stopRepository.findStopById(request.toStopId())
                 .orElseThrow(() -> {
                     log.error("Destination stop not found with ID: {}", request.toStopId());
-                    return new EntityNotFoundException("Stop with ID " + request.toStopId() + " not found");
+                    return new NotFoundException("Stop with ID " + request.toStopId() + " not found");
                 });
 
         // 2. Validar que el asiento pertenece al bus del trip
@@ -133,7 +133,7 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Ticket not found with ID: {}", id);
-                    return new EntityNotFoundException("Ticket with ID " + id + " not found");
+                    return new NotFoundException("Ticket with ID " + id + " not found");
                 });
         return ticketMapper.toResponse(ticket);
     }
@@ -143,7 +143,7 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Ticket not found with ID: {}", id);
-                    return new EntityNotFoundException("Ticket with ID " + id + " not found");
+                    return new NotFoundException("Ticket with ID " + id + " not found");
                 });
 
         applyCancellationPolicy(ticket);
@@ -157,7 +157,7 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> {
                     log.error("Ticket not found with ID: {}", ticketId);
-                    return new EntityNotFoundException("Ticket with ID " + ticketId + " not found");
+                    return new NotFoundException("Ticket with ID " + ticketId + " not found");
                 });
 
         generateSimpleQrCode(ticket);
@@ -170,7 +170,7 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findByQrCode(qrCode)
                 .orElseThrow(() -> {
                     log.error("Ticket not found with QR code: {}", qrCode);
-                    return new EntityNotFoundException("Ticket with QR code " + qrCode + " not found");
+                    return new NotFoundException("Ticket with QR code " + qrCode + " not found");
                 });
 
         // Validar que el status sea SOLD
