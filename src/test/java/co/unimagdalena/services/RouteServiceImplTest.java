@@ -381,6 +381,7 @@ public class RouteServiceImplTest {
         route.getStops().add(stop);
 
         when(routeRepository.findRouteById(routeId)).thenReturn(Optional.of(route));
+        when(stopRepository.findById(stopId)).thenReturn(Optional.of(stop));
 
         // Act & Assert
         IllegalStateException exception = assertThrows(IllegalStateException.class,

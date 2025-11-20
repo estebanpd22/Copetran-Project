@@ -59,7 +59,7 @@ class PassengerServiceImplTest {
         );
 
         updateRequest = new PassengerUpdateRequest(
-                2L,
+                1L,
                 "Juan Perez Updated",
                 "CC",
                 "1234567890",
@@ -104,8 +104,9 @@ class PassengerServiceImplTest {
     void shouldCreatePassengerSuccessfullyWithUser() {
         // Arrange
         when(passengerRepository.existsByDocumentNumber(createRequest.documentNumber())).thenReturn(false);
+        assertNotNull(createRequest.userId());
         when(passengerMapper.toEntity(createRequest)).thenReturn(passenger);
-        when(userRepository.findById(createRequest.userId())).thenReturn(Optional.of(user));
+        when(userRepository.findUserById(createRequest.userId())).thenReturn(Optional.of(user));
         when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
         when(passengerMapper.toResponse(passenger)).thenReturn(passengerResponse);
 
@@ -116,7 +117,7 @@ class PassengerServiceImplTest {
         assertNotNull(result);
         assertEquals(passengerResponse.id(), result.id());
         verify(passengerRepository).existsByDocumentNumber(createRequest.documentNumber());
-        verify(userRepository).findById(createRequest.userId());
+        verify(userRepository).findUserById(createRequest.userId());
         verify(passengerRepository).save(any(Passenger.class));
         verify(passengerMapper).toResponse(passenger);
     }
@@ -237,33 +238,48 @@ class PassengerServiceImplTest {
                 .email("newuser@example.com")
                 .build();
 
+        PassengerUpdateRequest localUpdate = new PassengerUpdateRequest(
+                2L, // <-- nuevo userId diferente al user actual (1L)
+                "Juan Perez Updated",
+                "CC",
+                "1234567890",
+                LocalDate.of(1990, 5, 15),
+                "+573009876543"
+        );
+
         when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(newUser));
-        doNothing().when(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
+        when(userRepository.findUserById(2L)).thenReturn(Optional.of(newUser));
+        doNothing().when(passengerMapper).updateEntityFromRequest(localUpdate, passenger);
         when(passengerRepository.save(passenger)).thenReturn(passenger);
 
         // Act
-        passengerService.updatePassenger(1L, updateRequest);
+        passengerService.updatePassenger(1L, localUpdate);
 
         // Assert
         verify(passengerRepository).findPassengerById(1L);
         verify(userRepository).findUserById(2L);
-        verify(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
+        verify(passengerMapper).updateEntityFromRequest(localUpdate, passenger);
         verify(passengerRepository).save(passenger);
     }
 
     @Test
     @DisplayName("Should throw NotFoundException when new user does not exist during update")
     void shouldThrowExceptionWhenNewUserDoesNotExist() {
+        PassengerUpdateRequest localUpdate = new PassengerUpdateRequest(
+                2L,
+                "Juan Perez Updated",
+                "CC",
+                "1234567890",
+                LocalDate.of(1990, 5, 15),
+                "+573009876543"
+        );
         // Arrange
         when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
-        when(userRepository.findById(2L)).thenReturn(Optional.empty());
-        doNothing().when(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
 
         // Act & Assert
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> passengerService.updatePassenger(1L, updateRequest)
+                () -> passengerService.updatePassenger(1L, localUpdate)
         );
 
         assertTrue(exception.getMessage().contains("Usuario con ID"));
