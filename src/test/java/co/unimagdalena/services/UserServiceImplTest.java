@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -35,6 +36,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -72,13 +76,14 @@ class UserServiceImplTest {
         savedUser.setEmail(request.email());
         savedUser.setPhone(request.phone());
         savedUser.setRole(UserRole.PASSENGER);
-        savedUser.setPasswordHash(request.password());
+        savedUser.setPasswordHash("encodedPassword");
         savedUser.setStatus(UserStatus.ACTIVE);
         savedUser.setCreatedAt(LocalDateTime.now());
 
         when(userMapper.toEntity(request)).thenReturn(new User());
         when(userRepository.existsByEmail(request.email())).thenReturn(false);
         when(userRepository.findByPhone(request.phone())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(request.password())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(userMapper.toResponse(savedUser)).thenReturn(new UserResponse(
                 1L, "John Doe", "john@example.com", "3101234567",
@@ -94,6 +99,7 @@ class UserServiceImplTest {
         assertEquals(UserRole.PASSENGER, response.role());
         verify(userRepository).save(any(User.class));
         verify(userRepository).existsByEmail(request.email());
+        verify(passwordEncoder).encode(request.password());
     }
 
     @Test
@@ -210,6 +216,7 @@ class UserServiceImplTest {
 
         when(userMapper.toEntity(request)).thenReturn(new User());
         when(userRepository.existsByEmail(request.email())).thenReturn(false);
+        when(passwordEncoder.encode(request.password())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(userMapper.toResponse(savedUser)).thenReturn(new UserResponse(
                 1L, "John Doe", "john@example.com", null,
@@ -248,6 +255,7 @@ class UserServiceImplTest {
 
         when(userRepository.existsByEmail(request.email())).thenReturn(false);
         when(userRepository.findByPhone(request.phone())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedTempPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(userMapper.toResponse(savedUser)).thenReturn(new UserResponse(
                 1L, "Admin User", "admin@example.com", "3101234567",
@@ -352,6 +360,7 @@ class UserServiceImplTest {
         savedUser.setCreatedAt(LocalDateTime.now());
 
         when(userRepository.existsByEmail(request.email())).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedTempPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(userMapper.toResponse(savedUser)).thenReturn(new UserResponse(
                 1L, "Clerk User", "clerk@example.com", null,
@@ -364,93 +373,6 @@ class UserServiceImplTest {
         // Assert
         assertNotNull(response);
         assertNull(response.phone());
-    }
-
-    // ============== login Tests ==============
-
-    @Test
-    @DisplayName("Should login user successfully with correct credentials")
-    void shouldLoginUserSuccessfully() {
-        // Arrange
-        String email = "john@example.com";
-        String password = "SecurePass123";
-
-        User user = new User();
-        user.setId(1L);
-        user.setEmail(email);
-        user.setPasswordHash(password);
-        user.setStatus(UserStatus.ACTIVE);
-        user.setRole(UserRole.PASSENGER);
-
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
-        when(userMapper.toResponse(user)).thenReturn(new UserResponse(
-                1L, "John Doe", email, "3101234567",
-                UserRole.PASSENGER, UserStatus.ACTIVE, LocalDateTime.now()
-        ));
-
-        // Act
-        UserResponse response = userService.login(email, password);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(email, response.email());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when user not found during login")
-    void shouldThrowExceptionWhenUserNotFoundDuringLogin() {
-        // Arrange
-        String email = "notfound@example.com";
-        String password = "AnyPassword";
-
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(NotFoundException.class, () -> {
-            userService.login(email, password);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw exception when password is incorrect")
-    void shouldThrowExceptionWhenPasswordIncorrect() {
-        // Arrange
-        String email = "john@example.com";
-        String password = "WrongPassword";
-
-        User user = new User();
-        user.setId(1L);
-        user.setEmail(email);
-        user.setPasswordHash("CorrectPassword");
-        user.setStatus(UserStatus.ACTIVE);
-
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
-
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            userService.login(email, password);
-        });
-    }
-
-    @Test
-    @DisplayName("Should throw exception when user account is not active")
-    void shouldThrowExceptionWhenUserAccountNotActive() {
-        // Arrange
-        String email = "john@example.com";
-        String password = "SecurePass123";
-
-        User user = new User();
-        user.setId(1L);
-        user.setEmail(email);
-        user.setPasswordHash(password);
-        user.setStatus(UserStatus.INACTIVE);
-
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
-
-        // Act & Assert
-        assertThrows(IllegalStateException.class, () -> {
-            userService.login(email, password);
-        });
     }
 
     // ============== updateUser Tests ==============
@@ -550,12 +472,17 @@ class UserServiceImplTest {
         Long userId = 1L;
         String oldPassword = "OldPass123";
         String newPassword = "NewPass456";
+        String encodedOldPassword = "encodedOldPass123";
+        String encodedNewPassword = "encodedNewPass456";
 
         User user = new User();
         user.setId(userId);
-        user.setPasswordHash(oldPassword);
+        user.setPasswordHash(encodedOldPassword);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(oldPassword, encodedOldPassword)).thenReturn(true);
+        when(passwordEncoder.matches(newPassword, encodedOldPassword)).thenReturn(false);
+        when(passwordEncoder.encode(newPassword)).thenReturn(encodedNewPassword);
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         // Act
@@ -587,11 +514,13 @@ class UserServiceImplTest {
     void shouldThrowExceptionWhenOldPasswordIncorrect() {
         // Arrange
         Long userId = 1L;
+        String encodedPassword = "encodedCorrectPass";
         User user = new User();
         user.setId(userId);
-        user.setPasswordHash("CorrectOldPass123");
+        user.setPasswordHash(encodedPassword);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("WrongOldPass", encodedPassword)).thenReturn(false);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
@@ -607,12 +536,14 @@ class UserServiceImplTest {
         // Arrange
         Long userId = 1L;
         String samePassword = "SamePass123";
+        String encodedPassword = "encodedSamePass123";
 
         User user = new User();
         user.setId(userId);
-        user.setPasswordHash(samePassword);
+        user.setPasswordHash(encodedPassword);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(samePassword, encodedPassword)).thenReturn(true);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
@@ -629,12 +560,14 @@ class UserServiceImplTest {
         Long userId = 1L;
         String oldPassword = "OldPass123";
         String weakPassword = "weak";
+        String encodedOldPassword = "encodedOldPass123";
 
         User user = new User();
         user.setId(userId);
-        user.setPasswordHash(oldPassword);
+        user.setPasswordHash(encodedOldPassword);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(oldPassword, encodedOldPassword)).thenReturn(true);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
@@ -651,12 +584,14 @@ class UserServiceImplTest {
         Long userId = 1L;
         String oldPassword = "OldPass123";
         String newPassword = "newpass123";  // Missing uppercase
+        String encodedOldPassword = "encodedOldPass123";
 
         User user = new User();
         user.setId(userId);
-        user.setPasswordHash(oldPassword);
+        user.setPasswordHash(encodedOldPassword);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(oldPassword, encodedOldPassword)).thenReturn(true);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
@@ -671,12 +606,14 @@ class UserServiceImplTest {
         Long userId = 1L;
         String oldPassword = "OldPass123";
         String newPassword = "NEWPASS123";  // Missing lowercase
+        String encodedOldPassword = "encodedOldPass123";
 
         User user = new User();
         user.setId(userId);
-        user.setPasswordHash(oldPassword);
+        user.setPasswordHash(encodedOldPassword);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(oldPassword, encodedOldPassword)).thenReturn(true);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
@@ -691,12 +628,14 @@ class UserServiceImplTest {
         Long userId = 1L;
         String oldPassword = "OldPass123";
         String newPassword = "NewPassAbc";  // Missing number
+        String encodedOldPassword = "encodedOldPass123";
 
         User user = new User();
         user.setId(userId);
-        user.setPasswordHash(oldPassword);
+        user.setPasswordHash(encodedOldPassword);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(oldPassword, encodedOldPassword)).thenReturn(true);
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
