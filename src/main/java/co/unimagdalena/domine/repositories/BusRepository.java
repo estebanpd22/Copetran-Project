@@ -45,7 +45,7 @@ public interface BusRepository extends JpaRepository<Bus,Long> {
     //Retorna la proporcion de sillas ocupadas con respecto a la capacidad maxima del bus
     @Query("SELECT (CAST(COUNT(s.id) AS double) / b.capacity) " +
             "FROM Bus b JOIN b.seats s " +
-            "WHERE b.id = :busId AND s.status = co.unimagdalena.domine.entities.SeatStatus.TAKEN " +
+            "WHERE b.id = :busId AND s.status = co.unimagdalena.domine.entities.SeatStatus.AVAILABLE " +
             "GROUP BY b.id, b.capacity") // <-- ¡La clave para resolver el error!
     Double calculateOccupancyRate(@Param("busId") Long busId);
 }
