@@ -2,6 +2,7 @@ package co.unimagdalena.api.controllers;
 
 import co.unimagdalena.api.UserController;
 import co.unimagdalena.api.dto.UserDto.*;
+import co.unimagdalena.config.TestSecurityConfig;
 import co.unimagdalena.domine.entities.UserRole;
 import co.unimagdalena.domine.entities.UserStatus;
 import co.unimagdalena.services.UserService;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,29 +26,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
+@Import(TestSecurityConfig.class)
 class UserControllerTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper om;
     @MockitoBean UserService service;
-
-    @Test
-    void register_shouldReturn201AndLocation() throws Exception {
-        var req = new UserCreateRequest("John Doe", "john@test.com", "1234567890",
-                UserRole.PASSENGER, "password123");
-        var resp = new UserResponse(1L, "John Doe", "john@test.com", "1234567890",
-                UserRole.PASSENGER, UserStatus.ACTIVE, LocalDateTime.now());
-
-        when(service.registerUser(any())).thenReturn(resp);
-
-        mvc.perform(post("/api/v1/users/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(req)))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/api/v1/users/1")))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.fullName").value("John Doe"));
-    }
 
     @Test
     void createEmployee_shouldReturn201AndLocation() throws Exception {
@@ -64,20 +49,6 @@ class UserControllerTest {
                 .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/api/v1/users/1")))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.role").value("ADMIN"));
-    }
-
-    @Test
-    void login_shouldReturn200() throws Exception {
-        var resp = new UserResponse(1L, "John Doe", "john@test.com", "1234567890",
-                UserRole.PASSENGER, UserStatus.ACTIVE, LocalDateTime.now());
-
-        when(service.login("john@test.com", "password123")).thenReturn(resp);
-
-        mvc.perform(post("/api/v1/users/login")
-                        .param("email", "john@test.com")
-                        .param("password", "password123"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("john@test.com"));
     }
 
     @Test
@@ -139,7 +110,7 @@ class UserControllerTest {
 
         when(service.getUserByEmail("john@test.com")).thenReturn(resp);
 
-        mvc.perform(get("/api/v1/users/email/john@test.com"))
+        mvc.perform(get("/api/v1/users/by-email/john@test.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("john@test.com"));
     }
@@ -151,7 +122,7 @@ class UserControllerTest {
 
         when(service.getUserByPhone("1234567890")).thenReturn(resp);
 
-        mvc.perform(get("/api/v1/users/phone/1234567890"))
+        mvc.perform(get("/api/v1/users/by-phone/1234567890"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.phone").value("1234567890"));
     }
@@ -167,7 +138,7 @@ class UserControllerTest {
 
         when(service.getAllUsersByRole(UserRole.DRIVER)).thenReturn(users);
 
-        mvc.perform(get("/api/v1/users/role/DRIVER"))
+        mvc.perform(get("/api/v1/users/by-role/DRIVER"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2));

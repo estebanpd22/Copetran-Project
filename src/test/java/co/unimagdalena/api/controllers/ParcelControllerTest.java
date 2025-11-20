@@ -2,12 +2,14 @@ package co.unimagdalena.api.controllers;
 
 import co.unimagdalena.api.ParcelController;
 import co.unimagdalena.api.dto.ParcelDto.*;
+import co.unimagdalena.config.TestSecurityConfig;
 import co.unimagdalena.domine.entities.ParcelStatus;
 import co.unimagdalena.services.ParcelService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ParcelController.class)
+@Import(TestSecurityConfig.class)
 class ParcelControllerTest {
 
     @Autowired MockMvc mvc;

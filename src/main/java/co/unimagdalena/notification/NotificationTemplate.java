@@ -1,48 +1,51 @@
 package co.unimagdalena.notification;
 
+import lombok.Getter;
+
+@Getter
 public enum NotificationTemplate {
 
     PURCHASE_CONFIRMED(
-            "✅ *Compra Confirmada - BusTransport*\n\n" +
-                    "🎫 Detalles de tu viaje:\n" +
-                    "📍 Origen: %s\n" +
-                    "📍 Destino: %s\n" +
-                    "📅 Fecha: %s\n" +
-                    "🕐 Hora salida: %s\n" +
-                    "💺 Asiento(s): %s\n" +
-                    "💰 Total pagado: $%s\n\n" +
-                    "🔖 Código de reserva: %s\n\n" +
-                    "¡Buen viaje! 🚌"
+            "🚌 *Copetran - Compra Confirmada*\n\n" +
+                    "✅ Su reserva ha sido confirmada exitosamente\n\n" +
+                    "📋 *Detalles del Viaje:*\n" +
+                    "• Ruta: %s → %s\n" +
+                    "• Fecha: %s\n" +
+                    "• Hora salida: %s\n" +
+                    "• Asiento: %s\n" +
+                    "• Valor: $%,d\n\n" +
+                    "🎫 *Código de Reserva:* %s\n" +
+                    "📱 *Presente este código al abordar*\n\n" +
+                    "¡Gracias por elegirnos! ✨"
     ),
 
     PLATFORM_CHANGE(
-            "⚠️ *Cambio de Andén - BusTransport*\n\n" +
-                    "Tu viaje ha sido actualizado:\n" +
-                    "📍 Ruta: %s → %s\n" +
-                    "📅 Fecha: %s\n" +
-                    "🚏 Nuevo andén: %s\n" +
-                    "🕐 Hora salida: %s\n\n" +
-                    "Por favor dirígete al nuevo andén."
+            "🔄 *Copetran - Cambio de Andén*\n\n" +
+                    "📢 *Información importante sobre su viaje:*\n\n" +
+                    "• Ruta: %s\n" +
+                    "• Fecha: %s\n" +
+                    "• Hora: %s\n" +
+                    "• 🔁 *Nuevo andén:* %s\n\n" +
+                    "📍 Por favor diríjase al andén asignado\n" +
+                    "⏰ Recomendamos llegar 15 minutos antes"
     ),
 
     ARRIVAL_SOON(
-            "🚌 *Bus Próximo a Llegar - BusTransport*\n\n" +
-                    "Tu bus está por llegar:\n" +
-                    "📍 Destino: %s\n" +
-                    "🕐 Llegada estimada: %s\n" +
-                    "🚏 Andén: %s\n" +
-                    "💺 Asiento: %s\n\n" +
-                    "Ten lista tu documentación."
+            "📍 *Copetran - Próxima Llegada*\n\n" +
+                    "Su destino está cerca\n\n" +
+                    "🎯 *Información:*\n" +
+                    "• Destino: %s\n" +
+                    "• Llegada estimada: %s\n" +
+                    "• Andén: %s\n" +
+                    "• Asiento: %s\n\n" +
+                    "📝 Tenga a mano su documento de identidad\n" +
+                    "🧳 Verifique su equipaje personal"
     );
 
     private final String template;
 
     NotificationTemplate(String template) {
         this.template = template;
-    }
-
-    public String getTemplate() {
-        return template;
     }
 
     public String format(Object... args) {

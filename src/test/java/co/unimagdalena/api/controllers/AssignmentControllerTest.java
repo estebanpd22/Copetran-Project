@@ -4,11 +4,13 @@ import co.unimagdalena.api.AssignmentController;
 import co.unimagdalena.api.dto.AssignmentDto.*;
 import co.unimagdalena.api.dto.TripDto;
 import co.unimagdalena.api.dto.UserDto;
+import co.unimagdalena.config.TestSecurityConfig;
 import co.unimagdalena.services.AssignmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AssignmentController.class)
+@Import(TestSecurityConfig.class)
 class AssignmentControllerTest {
 
     @Autowired MockMvc mvc;

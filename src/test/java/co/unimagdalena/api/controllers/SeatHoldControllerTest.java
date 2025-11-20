@@ -5,6 +5,7 @@ import co.unimagdalena.api.dto.SeatDto;
 import co.unimagdalena.api.dto.SeatHoldDto.*;
 import co.unimagdalena.api.dto.TripDto;
 import co.unimagdalena.api.dto.UserDto;
+import co.unimagdalena.config.TestSecurityConfig;
 import co.unimagdalena.domine.entities.SeatHoldStatus;
 import co.unimagdalena.domine.entities.SeatStatus;
 import co.unimagdalena.domine.entities.SeatType;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SeatHoldController.class)
+@Import(TestSecurityConfig.class)
 class SeatHoldControllerTest {
 
     @Autowired MockMvc mvc;

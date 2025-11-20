@@ -2,12 +2,14 @@ package co.unimagdalena.api.controllers;
 
 import co.unimagdalena.api.FareRuleController;
 import co.unimagdalena.api.dto.FareRuleDto.*;
+import co.unimagdalena.config.TestSecurityConfig;
 import co.unimagdalena.domine.entities.DynamicPricing;
 import co.unimagdalena.services.FareRuleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FareRuleController.class)
+@Import(TestSecurityConfig.class)
 class FareRuleControllerTest {
 
     @Autowired MockMvc mvc;

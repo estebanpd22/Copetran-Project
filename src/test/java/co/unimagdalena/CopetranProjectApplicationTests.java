@@ -9,5 +9,4 @@ class CopetranProjectApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

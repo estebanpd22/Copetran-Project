@@ -1,16 +1,17 @@
 package co.unimagdalena.services;
 
 import co.unimagdalena.api.dto.UserDto.*;
+import co.unimagdalena.domine.entities.User;
 import co.unimagdalena.domine.entities.UserRole;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
     UserResponse registerUser(UserCreateRequest request);
     UserResponse createEmployee(EmployeeCreateRequest request);
 
-    UserResponse login(String email, String password);
     void changePassword(Long id, String oldPassword, String newPassword);
     void desactivateUser(Long id);
     void reactivateUser(Long id);
@@ -20,4 +21,8 @@ public interface UserService {
     UserResponse getUserByEmail(String email);
     UserResponse getUserByPhone(String phone);
     List<UserResponse> getAllUsersByRole(UserRole role);
+
+    // ✅ AGREGAR: Métodos para Spring Security
+    Optional<User> findUserEntityByEmail(String email);
+    Optional<User> findUserEntityById(Long id);
 }

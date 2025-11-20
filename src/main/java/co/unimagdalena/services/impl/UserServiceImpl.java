@@ -10,11 +10,13 @@ import co.unimagdalena.services.UserService;
 import co.unimagdalena.services.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Slf4j
@@ -25,8 +27,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    // TODO: Inyectar cuando se implemente Spring Security
-    // private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponse registerUser(UserCreateRequest request) {
@@ -47,14 +48,10 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // Crear usuario
         User user = userMapper.toEntity(request);
-        // Forzar rol PASSENGER en registro público
         user.setRole(UserRole.PASSENGER);
 
-        // TODO: Encriptar password cuando se implemente Spring Security
-        // user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setPasswordHash(request.password());
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
 
         user.setStatus(UserStatus.ACTIVE);
         user.setCreatedAt(LocalDateTime.now());
@@ -71,7 +68,6 @@ public class UserServiceImpl implements UserService {
 
         validateEmail(request.email());
 
-        // Validar que el rol NO sea PASSENGER
         if (request.role() == UserRole.PASSENGER) {
             log.error("Cannot create PASSENGER accounts with createEmployee method");
             throw new IllegalArgumentException(
@@ -92,17 +88,14 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // Crear empleado
         User user = new User();
         user.setEmail(request.email());
         user.setFullName(request.name());
         user.setPhone(request.phone());
         user.setRole(request.role());
 
-        // Generar contraseña temporal
         String tempPassword = generateTemporaryPassword();
-        // TODO: Encriptar cuando se implemente Spring Security
-        user.setPasswordHash(tempPassword);
+        user.setPasswordHash(passwordEncoder.encode(tempPassword));
 
         user.setStatus(UserStatus.ACTIVE);
         user.setCreatedAt(LocalDateTime.now());
@@ -111,69 +104,7 @@ public class UserServiceImpl implements UserService {
 
         log.info("Employee created with ID: {} and role: {}. Temporary password: {}",
                 savedUser.getId(), savedUser.getRole(), tempPassword);
-
-        // TODO: Enviar email con contraseña temporal cuando implementes email service
-        // emailService.sendTemporaryPassword(savedUser.getEmail(), tempPassword);
-
         return userMapper.toResponse(savedUser);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserResponse login(String email, String password) {
-        log.debug("Login attempt for email: {}", email);
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    log.error("User not found with email: {}", email);
-                    return new NotFoundException("Invalid email or password");
-                });
-
-        if (user.getStatus() != UserStatus.ACTIVE) {
-            log.error("User account is not active. Status: {}", user.getStatus());
-            throw new IllegalStateException("User account is " + user.getStatus());
-        }
-
-        // TODO: Usar passwordEncoder.matches() cuando implementes Spring Security
-        if (!user.getPasswordHash().equals(password)) {
-            log.error("Invalid password for email: {}", email);
-            throw new IllegalArgumentException("Invalid email or password");
-        }
-
-        log.info("User logged in successfully: {} with role: {}", email, user.getRole());
-
-        // TODO: Retornar JWT token cuando implementes Spring Security
-        return userMapper.toResponse(user);
-    }
-
-    @Override
-    public void updateUser(Long id, UserUpdateRequest request) {
-        log.debug("Updating user with ID: {}", id);
-
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", id);
-                    return new NotFoundException("User with ID " + id + " not found");
-                });
-
-        // Validar y actualizar teléfono
-        if (request.phone() != null && !request.phone().equals(user.getPhone())) {
-            validatePhone(request.phone());
-            userRepository.findByPhone(request.phone()).ifPresent(existingUser -> {
-                if (!existingUser.getId().equals(id)) {
-                    throw new IllegalArgumentException("Phone " + request.phone() + " is already in use");
-                }
-            });
-        }
-
-        // Solo actualizar campos permitidos
-        // NO actualizar: role, email, status, password (estos tienen métodos específicos)
-
-        // Actualizar campos usando el mapper (que ignora los campos protegidos)
-        userMapper.updateEntity(request, user);
-        userRepository.save(user);
-
-        log.info("User updated successfully with ID: {}", id);
     }
 
     @Override
@@ -186,28 +117,37 @@ public class UserServiceImpl implements UserService {
                     return new NotFoundException("User with ID " + id + " not found");
                 });
 
-        // Validar contraseña actual
-        // TODO: Usar passwordEncoder.matches() cuando implementes Spring Security
-        if (!user.getPasswordHash().equals(oldPassword)) {
+        if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
             log.error("Invalid old password for user ID: {}", id);
             throw new IllegalArgumentException("Invalid old password");
         }
 
-        // Validar que la nueva sea diferente
-        if (oldPassword.equals(newPassword)) {
+        if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
             log.error("New password is the same as old password for user ID: {}", id);
             throw new IllegalArgumentException("New password must be different from old password");
         }
 
-        // Validar fortaleza de contraseña
         validatePasswordStrength(newPassword);
 
-        // TODO: Encriptar cuando implementes Spring Security
-        user.setPasswordHash(newPassword);
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
         log.info("Password changed successfully for user ID: {}", id);
     }
+
+    // ✅ AGREGAR: Métodos para Spring Security
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<User> findUserEntityByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<User> findUserEntityById(Long id) {
+        return userRepository.findById(id);
+    }
+
 
     @Override
     public void desactivateUser(Long id) {
@@ -249,6 +189,31 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         log.info("User reactivated successfully with ID: {}", id);
+    }
+
+    @Override
+    public void updateUser(Long id, UserUpdateRequest request) {
+        log.debug("Updating user with ID: {}", id);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", id);
+                    return new NotFoundException("User with ID " + id + " not found");
+                });
+
+        // Validar y actualizar teléfono
+        if (request.phone() != null && !request.phone().equals(user.getPhone())) {
+            validatePhone(request.phone());
+            userRepository.findByPhone(request.phone()).ifPresent(existingUser -> {
+                if (!existingUser.getId().equals(id)) {
+                    throw new IllegalArgumentException("Phone " + request.phone() + " is already in use");
+                }
+            });
+        }
+        userMapper.updateEntity(request, user);
+        userRepository.save(user);
+
+        log.info("User updated successfully with ID: {}", id);
     }
 
     @Override
