@@ -780,4 +780,8 @@ class TripServiceImplTest {
             verify(tripRepository, never()).save(any());
         }
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

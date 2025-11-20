@@ -565,4 +565,8 @@ class BusServiceImplTest {
 
         verify(busRepository, times(1)).findByPlate(plate);
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
