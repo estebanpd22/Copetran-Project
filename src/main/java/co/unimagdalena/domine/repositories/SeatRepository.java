@@ -14,4 +14,6 @@ public interface SeatRepository extends JpaRepository<Seat,Long> {
     Optional<Seat> findByBusIdAndNumber(Long busId, Integer number);
     List<Seat> findByBusIdAndType(Long busId, SeatType type);
     long countByBusId(Long busId);
+
+    double countSeatsByBus_Id(Long busId);
 }
