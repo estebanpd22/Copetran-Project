@@ -1,4 +1,4 @@
-package co.unimagdalena.api.controllers;
+package co.unimagdalena.api;
 
 import co.unimagdalena.api.RouteController;
 import co.unimagdalena.api.dto.RouteDto.*;
