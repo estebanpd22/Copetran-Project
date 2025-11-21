@@ -6,7 +6,6 @@ import co.unimagdalena.domine.repositories.*;
 import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.services.impl.IncidentServiceImpl;
 import co.unimagdalena.services.mapper.IncidentMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -574,8 +573,4 @@ class IncidentServiceImplTest {
         verify(incidentRepository).findRecentByType(type);
         verify(incidentMapper, never()).toResponse(any());
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

@@ -39,6 +39,7 @@ public class User {
     @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "status")
     private UserStatus status;
 

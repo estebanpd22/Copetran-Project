@@ -498,8 +498,4 @@ class ConfigServiceImplTest {
                 "50.0"
         );
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

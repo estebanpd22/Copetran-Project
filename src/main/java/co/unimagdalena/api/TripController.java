@@ -6,6 +6,7 @@ import co.unimagdalena.services.TripService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,6 +22,7 @@ public class TripController {
     private final TripService tripService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('DISPATCHER', 'ADMIN')")
     public ResponseEntity<TripResponse> create(@Validated @RequestBody TripCreateRequest request,
                                                UriComponentsBuilder uriBuilder) {
         var tripCreated = tripService.createTrip(request);
@@ -31,6 +33,7 @@ public class TripController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('DISPATCHER', 'ADMIN')")
     public ResponseEntity<Void> update(@PathVariable Long id,
                                        @Validated @RequestBody TripUpdateRequest request) {
         tripService.updateTrip(id, request);
@@ -38,6 +41,7 @@ public class TripController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         tripService.deleteTrip(id);
         return ResponseEntity.noContent().build();
@@ -56,6 +60,7 @@ public class TripController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('DISPATCHER', 'ADMIN')")
     public ResponseEntity<Void> updateStatus(@PathVariable Long id,
                                              @RequestParam TripStatus status) {
         tripService.updateTripStatus(id, status);
@@ -70,5 +75,28 @@ public class TripController {
     @GetMapping("/{id}/check-overbooking")
     public ResponseEntity<Boolean> checkOverbooking(@PathVariable Long id) {
         return ResponseEntity.ok(tripService.checkOverbookingConditions(id));
+    }
+
+    // NEW ENDPOINTS FOR BOARDING AND DEPARTURE
+    
+    @PostMapping("/{id}/boarding/open")
+    @PreAuthorize("hasAnyRole('DISPATCHER', 'DRIVER', 'ADMIN')")
+    public ResponseEntity<Void> openBoarding(@PathVariable Long id) {
+        tripService.openBoarding(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/boarding/close")
+    @PreAuthorize("hasAnyRole('DISPATCHER', 'DRIVER', 'ADMIN')")
+    public ResponseEntity<Void> closeBoarding(@PathVariable Long id) {
+        tripService.closeBoarding(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/depart")
+    @PreAuthorize("hasAnyRole('DISPATCHER', 'DRIVER', 'ADMIN')")
+    public ResponseEntity<Void> depart(@PathVariable Long id) {
+        tripService.departTrip(id);
+        return ResponseEntity.noContent().build();
     }
 }

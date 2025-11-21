@@ -12,7 +12,6 @@ import co.unimagdalena.domine.repositories.SeatRepository;
 import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.services.impl.SeatServiceImpl;
 import co.unimagdalena.services.mapper.SeatMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -204,11 +203,6 @@ class SeatServiceImplTest {
         );
 
         when(seatRepository.findById(1L)).thenReturn(Optional.of(existingSeat));
-<<<<<<< Updated upstream
-        when(seatRepository.findByBusIdAndNumber(existingSeat.getBus().getId(), 1))
-                .thenReturn(Optional.empty());
-=======
->>>>>>> Stashed changes
         when(seatRepository.save(any(Seat.class))).thenReturn(updatedSeat);
         when(seatMapper.toResponse(updatedSeat)).thenReturn(response);
 
@@ -571,8 +565,4 @@ class SeatServiceImplTest {
         assertTrue(result.isEmpty());
         verify(seatRepository, times(1)).findAll();
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

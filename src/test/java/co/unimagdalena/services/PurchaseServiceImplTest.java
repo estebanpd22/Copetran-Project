@@ -8,12 +8,7 @@ import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.notification.NotificationHelper;
 import co.unimagdalena.services.impl.PurchaseServiceImpl;
 import co.unimagdalena.services.mapper.PurchaseMapper;
-<<<<<<< Updated upstream
-=======
-import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.message.Message;
->>>>>>> Stashed changes
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,13 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
-<<<<<<< Updated upstream
 
-=======
-import java.util.logging.Logger;
-
-import static org.hamcrest.MatcherAssert.assertThat;
->>>>>>> Stashed changes
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -275,11 +264,6 @@ public class PurchaseServiceImplTest {
                 userId, PaymentMethod.CASH, new ArrayList<>()
         );
 
-<<<<<<< Updated upstream
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-=======
->>>>>>> Stashed changes
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> purchaseService.createPurchase(createRequest));
@@ -329,10 +313,6 @@ public class PurchaseServiceImplTest {
                 userId, PaymentMethod.CASH, ticketRequests
         );
 
-<<<<<<< Updated upstream
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-=======
->>>>>>> Stashed changes
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -451,11 +431,7 @@ public class PurchaseServiceImplTest {
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> purchaseService.confirmPurchase(purchaseId, "REF123"));
 
-<<<<<<< Updated upstream
-        assertTrue(exception.getMessage().toLowerCase().contains("pending"));
-=======
         assertTrue(exception.getMessage().toLowerCase().contains("re-confirmar"));
->>>>>>> Stashed changes
         verify(purchaseRepository, never()).save(any(Purchase.class));
     }
 
@@ -471,11 +447,6 @@ public class PurchaseServiceImplTest {
                 new BigDecimal("50000"), PaymentStatus.PENDING, user);
 
         when(purchaseRepository.findPurchaseById(purchaseId)).thenReturn(Optional.of(purchase));
-<<<<<<< Updated upstream
-        doThrow(new IllegalStateException("SeatHolds expired"))
-                .when(seatHoldService).validateActiveHolds(anyLong(), anyList(), anyLong());
-=======
->>>>>>> Stashed changes
 
         // Act & Assert
         IllegalStateException exception = assertThrows(IllegalStateException.class,
@@ -727,8 +698,4 @@ public class PurchaseServiceImplTest {
         assertNotNull(responses);
         assertTrue(responses.isEmpty());
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

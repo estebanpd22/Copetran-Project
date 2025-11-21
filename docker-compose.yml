@@ -21,6 +21,19 @@ services:
     container_name: copetran_backend
     depends_on:
       - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/copetran_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres123
+
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+
+      SPRING_FLYWAY_ENABLED: true
+      SPRING_FLYWAY_URL: jdbc:postgresql://postgres:5432/copetran_db
+      SPRING_FLYWAY_USER: postgres
+      SPRING_FLYWAY_PASSWORD: postgres123
+
     ports:
       - "8083:8080"
     networks:

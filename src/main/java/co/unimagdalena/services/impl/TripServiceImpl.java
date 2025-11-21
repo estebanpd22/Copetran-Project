@@ -233,6 +233,75 @@ public class TripServiceImpl implements TripService {
         log.info("Trip {} status updated to: {}", tripId, newStatus);
     }
 
+    @Override
+    public void openBoarding(Long tripId) {
+        log.info("Opening boarding for trip: {}", tripId);
+
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with id: " + tripId));
+
+        if (trip.getStatus() != TripStatus.SCHEDULED) {
+            throw new IllegalStateException("Can only open boarding for SCHEDULED trips. Current status: " + trip.getStatus());
+        }
+
+        if (trip.getBus() == null) {
+            throw new IllegalStateException("Cannot open boarding: No bus assigned to trip");
+        }
+
+        trip.setBoardingStatus(BoardingStatus.OPEN);
+        trip.setStatus(TripStatus.BOARDING);
+        
+        tripRepository.save(trip);
+        log.info("Boarding opened for trip: {}", tripId);
+    }
+
+    @Override
+    public void closeBoarding(Long tripId) {
+        log.info("Closing boarding for trip: {}", tripId);
+
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with id: " + tripId));
+
+        if (trip.getBoardingStatus() != BoardingStatus.OPEN) {
+            throw new IllegalStateException("Boarding is not open. Current status: " + trip.getBoardingStatus());
+        }
+
+        trip.setBoardingStatus(BoardingStatus.CLOSED);
+        
+        tripRepository.save(trip);
+        log.info("Boarding closed for trip: {}", tripId);
+    }
+
+    @Override
+    public void departTrip(Long tripId) {
+        log.info("Processing departure for trip: {}", tripId);
+
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with id: " + tripId));
+
+        if (trip.getStatus() != TripStatus.BOARDING) {
+            throw new IllegalStateException("Trip must be in BOARDING status to depart. Current status: " + trip.getStatus());
+        }
+
+        if (trip.getBoardingStatus() != BoardingStatus.CLOSED) {
+            throw new IllegalStateException("Boarding must be closed before departure");
+        }
+
+        if (trip.getChecklist() == null || !Boolean.TRUE.equals(trip.getChecklist().getCompleted())) {
+            throw new IllegalStateException("Pre-departure checklist must be completed before departure");
+        }
+
+        if (!trip.getChecklist().isAllChecksComplete()) {
+            throw new IllegalStateException("All checklist items must be checked before departure");
+        }
+
+        trip.setStatus(TripStatus.DEPARTED);
+        trip.setActualDepartureAt(OffsetDateTime.now());
+        
+        tripRepository.save(trip);
+        log.info("Trip departed successfully: {} at {}", tripId, trip.getActualDepartureAt());
+    }
+
     // Métodos auxiliares privados
     private void validateTripDates(LocalDate date, OffsetDateTime departureAt, OffsetDateTime arrivalAt) {
         if (!departureAt.isBefore(arrivalAt)) {

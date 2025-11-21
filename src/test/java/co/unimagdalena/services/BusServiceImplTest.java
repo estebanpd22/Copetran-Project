@@ -5,12 +5,9 @@ import co.unimagdalena.api.dto.BusDto.*;
 import co.unimagdalena.domine.entities.*;
 import co.unimagdalena.domine.repositories.BusRepository;
 import co.unimagdalena.domine.repositories.SeatRepository;
-import co.unimagdalena.domine.repositories.TripRepository;
-import co.unimagdalena.domine.repositories.RouteRepository;
 import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.services.impl.BusServiceImpl;
 import co.unimagdalena.services.mapper.BusMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -565,8 +562,4 @@ class BusServiceImplTest {
 
         verify(busRepository, times(1)).findByPlate(plate);
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

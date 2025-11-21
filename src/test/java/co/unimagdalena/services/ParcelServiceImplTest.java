@@ -9,7 +9,6 @@ import co.unimagdalena.domine.repositories.TripRepository;
 import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.services.impl.ParcelServiceImpl;
 import co.unimagdalena.services.mapper.ParcelMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -919,19 +918,6 @@ class ParcelServiceImplTest {
         Stop fromStop = createStop(1L, "Parada Origen", 1, 1L);
         Stop toStop = createStop(2L, "Parada Destino", 3, 1L);
         Trip trip = createTrip(1L, 1L, TripStatus.DEPARTED);
-<<<<<<< Updated upstream
-        Parcel parcel = createParcel(1L, "PAQ-20250119-0001", ParcelStatus.IN_TRANSIT, fromStop, toStop, trip);
-        parcel.setDeliveryOTP("123456");
-
-        when(parcelRepository.findById(1L)).thenReturn(Optional.of(parcel));
-        when(parcelRepository.save(any(Parcel.class))).thenReturn(parcel);
-
-        // When
-        parcelService.confirmDelivery(1L, "WRONG-OTP", "https://example.com/proof.jpg");
-
-        // Then
-        verify(parcelRepository).findById(1L);
-=======
         Parcel parcel = createParcel(2L, "PAQ-20250119-0001", ParcelStatus.IN_TRANSIT, fromStop, toStop, trip);
         parcel.setDeliveryOTP("123456");
 
@@ -943,7 +929,6 @@ class ParcelServiceImplTest {
 
         // Then
         verify(parcelRepository, times(2)).findById(2L);
->>>>>>> Stashed changes
         verify(parcelRepository).save(parcel);
         assertEquals(ParcelStatus.FAILED, parcel.getStatus());
         verify(incidentService).createIncident(any(IncidentCreateRequest.class));
@@ -1064,8 +1049,4 @@ class ParcelServiceImplTest {
         assertEquals(ParcelStatus.FAILED, parcel.getStatus());
         verify(incidentService).createIncident(any(IncidentCreateRequest.class));
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

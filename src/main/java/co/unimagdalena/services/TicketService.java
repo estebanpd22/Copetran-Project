@@ -21,4 +21,5 @@ public interface TicketService {
     List<TicketResponse> getTicketsByTrip(Long tripId);
     List<TicketResponse> getTicketsByPurchase(Long purchaseId);
     List<TicketResponse> getTicketsByPassenger(Long passengerId);
+
 }

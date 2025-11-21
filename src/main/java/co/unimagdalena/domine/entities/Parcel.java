@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "parcels")
@@ -35,6 +38,9 @@ public class Parcel {
 
     @Column(nullable = false, name = "price")
     private BigDecimal price;
+
+    @Column(nullable = false, name = "createdAt")
+    private LocalDateTime createdAt;
 
     @Column(nullable = false, name = "parcel_status")
     @Enumerated(EnumType.STRING)

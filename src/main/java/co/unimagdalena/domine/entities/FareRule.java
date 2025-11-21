@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
-@Table(name = "fareRules")
+@Table(name = "fare_rules")
 @Getter
 @Setter
 @NoArgsConstructor

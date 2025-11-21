@@ -339,8 +339,4 @@ class BaggageServiceImplTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

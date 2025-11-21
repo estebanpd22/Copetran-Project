@@ -32,7 +32,16 @@ public class Trip {
     private OffsetDateTime arrivalAt;
 
     @Column(nullable = false, name = "status")
+    @Enumerated(EnumType.STRING)
     private TripStatus status;
+
+    @Column(name = "boarding_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private BoardingStatus boardingStatus = BoardingStatus.NOT_STARTED;
+
+    @Column(name = "actual_departure_at")
+    private OffsetDateTime actualDepartureAt;
 
     @ManyToOne
     @JoinColumn(name = "route_id")
@@ -41,6 +50,9 @@ public class Trip {
     @ManyToOne
     @JoinColumn(name = "bus_id")
     private Bus bus;
+
+    @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Checklist checklist;
 
     @OneToMany(mappedBy = "trip",  fetch = FetchType.LAZY)
     private List<SeatHold> seatHolds= new ArrayList<>();

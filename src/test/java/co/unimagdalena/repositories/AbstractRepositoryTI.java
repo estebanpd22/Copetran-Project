@@ -13,5 +13,5 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public abstract class AbstractRepositoryTI {
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgresqlContainer = new PostgreSQLContainer<>("postgres:16-alpine").withDatabaseName("test").withUsername("test").withPassword("test").withPassword("test");
+    static PostgreSQLContainer<?> postgresqlContainer = new PostgreSQLContainer<>("postgres:16").withDatabaseName("copetran_db").withUsername("postgres").withPassword("postgres123").withPassword("postgres123");
 }

@@ -18,4 +18,9 @@ public interface TripService {
 
     TripResponse getTripDetails(Long tripId);
     List<TripResponse> getTrips(String origin, String destination, LocalDate date);
+    
+    // New methods for boarding and departure
+    void openBoarding(Long tripId);
+    void closeBoarding(Long tripId);
+    void departTrip(Long tripId);
 }

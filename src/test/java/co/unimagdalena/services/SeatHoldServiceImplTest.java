@@ -8,7 +8,6 @@ import co.unimagdalena.domine.repositories.UserRepository;
 import co.unimagdalena.exception.NotFoundException;
 import co.unimagdalena.services.impl.SeatHoldServiceImpl;
 import co.unimagdalena.services.mapper.SeatHoldMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +23,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -944,8 +941,4 @@ public class SeatHoldServiceImplTest {
         assertTrue(responses.isEmpty());
         verify(seatHoldRepository, times(1)).findByUserId(userId);
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
