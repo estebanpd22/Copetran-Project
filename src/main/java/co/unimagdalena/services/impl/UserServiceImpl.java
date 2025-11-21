@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse registerUser(UserCreateRequest request) {
-        log.debug("Registering new user with email: {}", request.email());
+        log.debug("Registering new user with email: {} and role: {}", request.email(), request.role());
 
         validateEmail(request.email());
 
@@ -49,15 +49,15 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userMapper.toEntity(request);
-        user.setRole(UserRole.PASSENGER);
+
+        user.setRole(request.role());
 
         user.setPasswordHash(passwordEncoder.encode(request.password()));
-
         user.setStatus(UserStatus.ACTIVE);
         user.setCreatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(user);
-        log.info("Passenger registered successfully with ID: {}", savedUser.getId());
+        log.info("User registered successfully with ID: {} and role: {}", savedUser.getId(), savedUser.getRole());
 
         return userMapper.toResponse(savedUser);
     }
@@ -135,7 +135,6 @@ public class UserServiceImpl implements UserService {
         log.info("Password changed successfully for user ID: {}", id);
     }
 
-    // ✅ AGREGAR: Métodos para Spring Security
     @Override
     @Transactional(readOnly = true)
     public Optional<User> findUserEntityByEmail(String email) {
@@ -289,7 +288,6 @@ public class UserServiceImpl implements UserService {
             return;  // Phone es opcional
         }
 
-        // Formato colombiano: 10 dígitos, empieza con 3
         String phoneRegex = "^3[0-9]{9}$";
         if (!phone.matches(phoneRegex)) {
             throw new IllegalArgumentException(
@@ -318,7 +316,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private String generateTemporaryPassword() {
-        // Genera contraseña temporal de 12 caracteres: Temp + 8 caracteres aleatorios
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
         StringBuilder password = new StringBuilder("Temp");

@@ -13,7 +13,7 @@ public enum NotificationTemplate {
                     "• Fecha: %s\n" +
                     "• Hora salida: %s\n" +
                     "• Asiento: %s\n" +
-                    "• Valor: $%,d\n\n" +
+                    "• Valor: $%,.2f\n\n" +
                     "🎫 *Código de Reserva:* %s\n" +
                     "📱 *Presente este código al abordar*\n\n" +
                     "¡Gracias por elegirnos! ✨"
@@ -22,7 +22,7 @@ public enum NotificationTemplate {
     PLATFORM_CHANGE(
             "🔄 *Copetran - Cambio de Andén*\n\n" +
                     "📢 *Información importante sobre su viaje:*\n\n" +
-                    "• Ruta: %s\n" +
+                    "• Ruta: %s → %s\n" +
                     "• Fecha: %s\n" +
                     "• Hora: %s\n" +
                     "• 🔁 *Nuevo andén:* %s\n\n" +
@@ -40,6 +40,17 @@ public enum NotificationTemplate {
                     "• Asiento: %s\n\n" +
                     "📝 Tenga a mano su documento de identidad\n" +
                     "🧳 Verifique su equipaje personal"
+    ),
+
+    TICKET_CANCELLED(
+            "❌ *Copetran - Ticket Cancelado*\n\n" +
+                    "📋 *Detalles de la cancelación:*\n" +
+                    "• Ruta: %s → %s\n" +
+                    "• Fecha: %s\n" +
+                    "• Asiento: %s\n" +
+                    "• Motivo: %s\n\n" +
+                    "💰 *Reembolso:* Será procesado según nuestra política\n" +
+                    "📞 Para más información contacte a servicio al cliente"
     );
 
     private final String template;
@@ -49,6 +60,6 @@ public enum NotificationTemplate {
     }
 
     public String format(Object... args) {
-        return String.format(template, args);
+            return String.format(template, args);
     }
 }

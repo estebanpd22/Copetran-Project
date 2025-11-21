@@ -31,7 +31,7 @@ public class CustomUserDetails implements UserDetails {
                 user.getFullName(),
                 user.getPhone(),
                 user.getPasswordHash(),
-                "ROLE_" + user.getRole().name(),
+                user.getRole().name(),
                 user.getStatus() == UserStatus.ACTIVE,
                 user.getStatus().name()
         );
@@ -39,7 +39,9 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(role));
+        return Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_" + role)
+        );
     }
 
     @Override

@@ -22,7 +22,6 @@ public interface UserService {
     UserResponse getUserByPhone(String phone);
     List<UserResponse> getAllUsersByRole(UserRole role);
 
-    // ✅ AGREGAR: Métodos para Spring Security
     Optional<User> findUserEntityByEmail(String email);
     Optional<User> findUserEntityById(Long id);
 }

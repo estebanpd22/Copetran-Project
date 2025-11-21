@@ -29,7 +29,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-
         try {
             final String authHeader = request.getHeader("Authorization");
 
@@ -44,6 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(userEmail);
 
+                String roleFromToken = jwtService.extractUserRole(jwt);
+                log.debug("=== JWT FILTER DEBUG ===");
+                log.debug("User: {}", userEmail);
+                log.debug("Role from token: {}", roleFromToken);
+                log.debug("Role from userDetails: {}", userDetails.getRole());
+                log.debug("Authorities from userDetails: {}", userDetails.getAuthorities());
+
                 if (jwtService.validateToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -54,6 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
 
                     log.debug("Usuario autenticado: {} - {}", userDetails.getFullName(), userDetails.getRole());
+                } else {
+                    log.warn("Token inválido para el usuario: {}", userEmail);
                 }
             }
         } catch (Exception e) {
