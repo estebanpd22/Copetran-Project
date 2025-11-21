@@ -944,4 +944,8 @@ public class SeatHoldServiceImplTest {
         assertTrue(responses.isEmpty());
         verify(seatHoldRepository, times(1)).findByUserId(userId);
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

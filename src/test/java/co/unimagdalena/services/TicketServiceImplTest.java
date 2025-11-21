@@ -4,9 +4,15 @@ import co.unimagdalena.api.dto.PurchaseDto.PurchaseCreateRequest;
 import co.unimagdalena.api.dto.TicketDto.*;
 import co.unimagdalena.domine.entities.*;
 import co.unimagdalena.domine.repositories.*;
+<<<<<<< Updated upstream
 import co.unimagdalena.services.impl.TicketServiceImpl;
 import co.unimagdalena.services.mapper.TicketMapper;
 import jakarta.persistence.EntityNotFoundException;
+=======
+import co.unimagdalena.exception.NotFoundException;
+import co.unimagdalena.services.impl.TicketServiceImpl;
+import co.unimagdalena.services.mapper.TicketMapper;
+>>>>>>> Stashed changes
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,10 +102,17 @@ class TicketServiceImplTest {
     void shouldCreateTicketSuccessfully() {
         // Arrange
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
         when(stopRepository.findById(ticketRequest.fromStopId())).thenReturn(Optional.of(fromStop));
         when(stopRepository.findById(ticketRequest.toStopId())).thenReturn(Optional.of(toStop));
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+        when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
+        when(stopRepository.findStopById(ticketRequest.fromStopId())).thenReturn(Optional.of(fromStop));
+        when(stopRepository.findStopById(ticketRequest.toStopId())).thenReturn(Optional.of(toStop));
+>>>>>>> Stashed changes
         when(ticketRepository.findByTripId(trip.getId())).thenReturn(Collections.emptyList());
         when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
 
@@ -123,7 +136,11 @@ class TicketServiceImplTest {
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.empty());
 
         // Act & Assert
+<<<<<<< Updated upstream
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.createTicket(ticketRequest, purchase));
         assertTrue(exception.getMessage().contains("Trip"));
         verify(ticketRepository, never()).save(any());
@@ -134,10 +151,17 @@ class TicketServiceImplTest {
     void shouldThrowExceptionWhenPassengerNotFound() {
         // Arrange
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.empty());
 
         // Act & Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.createTicket(ticketRequest, purchase));
         assertTrue(exception.getMessage().contains("Passenger"));
         verify(ticketRepository, never()).save(any());
@@ -148,11 +172,19 @@ class TicketServiceImplTest {
     void shouldThrowExceptionWhenSeatNotFound() {
         // Arrange
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.empty());
 
         // Act & Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+        when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.createTicket(ticketRequest, purchase));
         assertTrue(exception.getMessage().contains("Seat"));
         verify(ticketRepository, never()).save(any());
@@ -163,12 +195,20 @@ class TicketServiceImplTest {
     void shouldThrowExceptionWhenFromStopNotFound() {
         // Arrange
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
         when(stopRepository.findById(ticketRequest.fromStopId())).thenReturn(Optional.empty());
 
         // Act & Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+        when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.createTicket(ticketRequest, purchase));
         assertTrue(exception.getMessage().contains("Stop"));
         verify(ticketRepository, never()).save(any());
@@ -179,6 +219,7 @@ class TicketServiceImplTest {
     void shouldThrowExceptionWhenToStopNotFound() {
         // Arrange
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
         when(stopRepository.findById(ticketRequest.fromStopId())).thenReturn(Optional.of(fromStop));
@@ -186,6 +227,13 @@ class TicketServiceImplTest {
 
         // Act & Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+        when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.createTicket(ticketRequest, purchase));
         assertTrue(exception.getMessage().contains("Stop"));
         verify(ticketRepository, never()).save(any());
@@ -200,10 +248,17 @@ class TicketServiceImplTest {
         seat.setBus(differentBus);
 
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
         when(stopRepository.findById(ticketRequest.fromStopId())).thenReturn(Optional.of(fromStop));
         when(stopRepository.findById(ticketRequest.toStopId())).thenReturn(Optional.of(toStop));
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+        when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
+        when(stopRepository.findStopById(ticketRequest.fromStopId())).thenReturn(Optional.of(fromStop));
+        when(stopRepository.findStopById(ticketRequest.toStopId())).thenReturn(Optional.of(toStop));
+>>>>>>> Stashed changes
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -221,13 +276,21 @@ class TicketServiceImplTest {
         Stop differentStop = createStop(1, differentRoute);
 
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+>>>>>>> Stashed changes
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
         when(stopRepository.findById(ticketRequest.fromStopId())).thenReturn(Optional.of(differentStop));
         when(stopRepository.findById(ticketRequest.toStopId())).thenReturn(Optional.of(toStop));
 
         // Act & Assert
+<<<<<<< Updated upstream
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+=======
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.createTicket(ticketRequest, purchase));
         assertTrue(exception.getMessage().contains("origin stop does not belong to the trip route"));
         verify(ticketRepository, never()).save(any());
@@ -242,13 +305,21 @@ class TicketServiceImplTest {
         Stop differentStop = createStop(3, differentRoute);
 
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+>>>>>>> Stashed changes
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
         when(stopRepository.findById(ticketRequest.fromStopId())).thenReturn(Optional.of(fromStop));
         when(stopRepository.findById(ticketRequest.toStopId())).thenReturn(Optional.of(differentStop));
 
         // Act & Assert
+<<<<<<< Updated upstream
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+=======
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.createTicket(ticketRequest, purchase));
         assertTrue(exception.getMessage().contains("destination stop does not belong to the trip route"));
         verify(ticketRepository, never()).save(any());
@@ -262,7 +333,11 @@ class TicketServiceImplTest {
         Stop invalidToStop = createStop(2, route);
 
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+>>>>>>> Stashed changes
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
         when(stopRepository.findById(ticketRequest.fromStopId())).thenReturn(Optional.of(invalidFromStop));
         when(stopRepository.findById(ticketRequest.toStopId())).thenReturn(Optional.of(invalidToStop));
@@ -282,6 +357,7 @@ class TicketServiceImplTest {
         existingTicket.setStatus(TicketStatus.SOLD);
 
         when(tripRepository.findById(ticketRequest.tripId())).thenReturn(Optional.of(trip));
+<<<<<<< Updated upstream
         when(passengerRepository.findById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
         when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
         when(stopRepository.findById(ticketRequest.fromStopId())).thenReturn(Optional.of(fromStop));
@@ -290,6 +366,16 @@ class TicketServiceImplTest {
 
         // Act & Assert
         IllegalStateException exception = assertThrows(IllegalStateException.class,
+=======
+        when(passengerRepository.findPassengerById(ticketRequest.passengerId())).thenReturn(Optional.of(passenger));
+        when(seatRepository.findById(ticketRequest.seatId())).thenReturn(Optional.of(seat));
+        when(stopRepository.findStopById(ticketRequest.fromStopId())).thenReturn(Optional.of(fromStop));
+        when(stopRepository.findStopById(ticketRequest.toStopId())).thenReturn(Optional.of(toStop));
+        when(ticketRepository.findByTripId(trip.getId())).thenReturn(List.of(existingTicket));
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.createTicket(ticketRequest, purchase));
         assertTrue(exception.getMessage().contains("Seat is already occupied"));
         verify(ticketRepository, never()).save(any());
@@ -326,7 +412,11 @@ class TicketServiceImplTest {
         when(ticketRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
+<<<<<<< Updated upstream
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.getTicket(999L));
         assertTrue(exception.getMessage().contains("Ticket"));
         verify(ticketMapper, never()).toResponse(any());
@@ -372,7 +462,11 @@ class TicketServiceImplTest {
         when(ticketRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
+<<<<<<< Updated upstream
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.deleteTicket(999L));
         assertTrue(exception.getMessage().contains("Ticket"));
         verify(ticketRepository, never()).save(any());
@@ -402,7 +496,11 @@ class TicketServiceImplTest {
         when(ticketRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
+<<<<<<< Updated upstream
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.generateQrForTicket(999L));
         assertTrue(exception.getMessage().contains("Ticket"));
         verify(ticketRepository, never()).save(any());
@@ -436,7 +534,11 @@ class TicketServiceImplTest {
         when(ticketRepository.findByQrCode(qrCode)).thenReturn(Optional.empty());
 
         // Act & Assert
+<<<<<<< Updated upstream
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+=======
+        NotFoundException exception = assertThrows(NotFoundException.class,
+>>>>>>> Stashed changes
                 () -> ticketService.validateQrForTicket(qrCode));
         assertTrue(exception.getMessage().contains("Ticket"));
         verify(ticketRepository, never()).save(any());
@@ -759,4 +861,8 @@ class TicketServiceImplTest {
                 .purchase(purchase)
                 .build();
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
