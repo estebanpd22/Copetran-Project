@@ -919,7 +919,6 @@ class ParcelServiceImplTest {
         Stop fromStop = createStop(1L, "Parada Origen", 1, 1L);
         Stop toStop = createStop(2L, "Parada Destino", 3, 1L);
         Trip trip = createTrip(1L, 1L, TripStatus.DEPARTED);
-<<<<<<< Updated upstream
         Parcel parcel = createParcel(1L, "PAQ-20250119-0001", ParcelStatus.IN_TRANSIT, fromStop, toStop, trip);
         parcel.setDeliveryOTP("123456");
 
@@ -930,11 +929,6 @@ class ParcelServiceImplTest {
         parcelService.confirmDelivery(1L, "WRONG-OTP", "https://example.com/proof.jpg");
 
         // Then
-        verify(parcelRepository).findById(1L);
-=======
-        Parcel parcel = createParcel(2L, "PAQ-20250119-0001", ParcelStatus.IN_TRANSIT, fromStop, toStop, trip);
-        parcel.setDeliveryOTP("123456");
-
         when(parcelRepository.findById(2L)).thenReturn(Optional.of(parcel));
         when(parcelRepository.save(any(Parcel.class))).thenReturn(parcel);
 
@@ -943,7 +937,6 @@ class ParcelServiceImplTest {
 
         // Then
         verify(parcelRepository, times(2)).findById(2L);
->>>>>>> Stashed changes
         verify(parcelRepository).save(parcel);
         assertEquals(ParcelStatus.FAILED, parcel.getStatus());
         verify(incidentService).createIncident(any(IncidentCreateRequest.class));
@@ -1064,8 +1057,4 @@ class ParcelServiceImplTest {
         assertEquals(ParcelStatus.FAILED, parcel.getStatus());
         verify(incidentService).createIncident(any(IncidentCreateRequest.class));
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

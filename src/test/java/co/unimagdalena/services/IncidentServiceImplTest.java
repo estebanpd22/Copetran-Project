@@ -574,8 +574,4 @@ class IncidentServiceImplTest {
         verify(incidentRepository).findRecentByType(type);
         verify(incidentMapper, never()).toResponse(any());
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

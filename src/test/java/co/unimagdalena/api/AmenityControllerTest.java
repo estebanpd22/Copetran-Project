@@ -1,12 +1,14 @@
 package co.unimagdalena.api;
 
-import co.unimagdalena.api.AmenityController;
 import co.unimagdalena.config.TestSecurityConfig;
+import co.unimagdalena.security.jwt.JwtService;
+import co.unimagdalena.security.user.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import co.unimagdalena.api.dto.AmenityDto.*;
 import co.unimagdalena.services.AmenityService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -22,13 +24,18 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AmenityController.class)
+@WebMvcTest(controllers = AmenityController.class)
 @Import(TestSecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
 class AmenityControllerTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper om;
     @MockitoBean AmenityService service;
+    @MockitoBean JwtService js;
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
+
 
     @Test
     void create_shouldReturn201AndLocation() throws Exception {

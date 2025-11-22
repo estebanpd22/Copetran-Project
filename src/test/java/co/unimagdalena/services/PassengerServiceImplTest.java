@@ -20,15 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-<<<<<<< Updated upstream
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-=======
 import java.util.*;
->>>>>>> Stashed changes
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -66,11 +62,7 @@ class PassengerServiceImplTest {
         );
 
         updateRequest = new PassengerUpdateRequest(
-<<<<<<< Updated upstream
                 2L,
-=======
-                1L,
->>>>>>> Stashed changes
                 "Juan Perez Updated",
                 "CC",
                 "1234567890",
@@ -115,14 +107,11 @@ class PassengerServiceImplTest {
     void shouldCreatePassengerSuccessfullyWithUser() {
         // Arrange
         when(passengerRepository.existsByDocumentNumber(createRequest.documentNumber())).thenReturn(false);
-<<<<<<< Updated upstream
         when(passengerMapper.toEntity(createRequest)).thenReturn(passenger);
         when(userRepository.findById(createRequest.userId())).thenReturn(Optional.of(user));
-=======
         assertNotNull(createRequest.userId());
         when(passengerMapper.toEntity(createRequest)).thenReturn(passenger);
         when(userRepository.findUserById(createRequest.userId())).thenReturn(Optional.of(user));
->>>>>>> Stashed changes
         when(passengerRepository.save(any(Passenger.class))).thenReturn(passenger);
         when(passengerMapper.toResponse(passenger)).thenReturn(passengerResponse);
 
@@ -133,11 +122,8 @@ class PassengerServiceImplTest {
         assertNotNull(result);
         assertEquals(passengerResponse.id(), result.id());
         verify(passengerRepository).existsByDocumentNumber(createRequest.documentNumber());
-<<<<<<< Updated upstream
         verify(userRepository).findById(createRequest.userId());
-=======
         verify(userRepository).findUserById(createRequest.userId());
->>>>>>> Stashed changes
         verify(passengerRepository).save(any(Passenger.class));
         verify(passengerMapper).toResponse(passenger);
     }
@@ -198,11 +184,8 @@ class PassengerServiceImplTest {
         // Arrange
         when(passengerRepository.existsByDocumentNumber(createRequest.documentNumber())).thenReturn(false);
         when(passengerMapper.toEntity(createRequest)).thenReturn(passenger);
-<<<<<<< Updated upstream
         when(userRepository.findById(createRequest.userId())).thenReturn(Optional.empty());
-=======
         when(userRepository.findUserById(createRequest.userId())).thenReturn(Optional.empty());
->>>>>>> Stashed changes
 
         // Act & Assert
         NotFoundException exception = assertThrows(
@@ -221,11 +204,8 @@ class PassengerServiceImplTest {
     @DisplayName("Should update passenger successfully")
     void shouldUpdatePassengerSuccessfully() {
         // Arrange
-<<<<<<< Updated upstream
         when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
-=======
         when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
->>>>>>> Stashed changes
         doNothing().when(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
         when(passengerRepository.save(passenger)).thenReturn(passenger);
 
@@ -233,11 +213,8 @@ class PassengerServiceImplTest {
         passengerService.updatePassenger(1L, updateRequest);
 
         // Assert
-<<<<<<< Updated upstream
         verify(passengerRepository).findById(1L);
-=======
         verify(passengerRepository).findPassengerById(1L);
->>>>>>> Stashed changes
         verify(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
         verify(passengerRepository).save(passenger);
     }
@@ -246,11 +223,8 @@ class PassengerServiceImplTest {
     @DisplayName("Should throw NotFoundException when passenger to update does not exist")
     void shouldThrowExceptionWhenPassengerToUpdateDoesNotExist() {
         // Arrange
-<<<<<<< Updated upstream
         when(passengerRepository.findById(999L)).thenReturn(Optional.empty());
-=======
         when(passengerRepository.findPassengerById(999L)).thenReturn(Optional.empty());
->>>>>>> Stashed changes
 
         // Act & Assert
         NotFoundException exception = assertThrows(
@@ -260,11 +234,8 @@ class PassengerServiceImplTest {
 
         assertTrue(exception.getMessage().contains("Pasajero con ID"));
         assertTrue(exception.getMessage().contains("no encontrado"));
-<<<<<<< Updated upstream
         verify(passengerRepository).findById(999L);
-=======
         verify(passengerRepository).findPassengerById(999L);
->>>>>>> Stashed changes
         verify(passengerRepository, never()).save(any());
     }
 
@@ -278,7 +249,6 @@ class PassengerServiceImplTest {
                 .email("newuser@example.com")
                 .build();
 
-<<<<<<< Updated upstream
         when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
         when(userRepository.findById(2L)).thenReturn(Optional.of(newUser));
         doNothing().when(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
@@ -291,7 +261,6 @@ class PassengerServiceImplTest {
         verify(passengerRepository).findById(1L);
         verify(userRepository).findById(2L);
         verify(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
-=======
         PassengerUpdateRequest localUpdate = new PassengerUpdateRequest(
                 2L, // <-- nuevo userId diferente al user actual (1L)
                 "Juan Perez Updated",
@@ -313,19 +282,16 @@ class PassengerServiceImplTest {
         verify(passengerRepository).findPassengerById(1L);
         verify(userRepository).findUserById(2L);
         verify(passengerMapper).updateEntityFromRequest(localUpdate, passenger);
->>>>>>> Stashed changes
         verify(passengerRepository).save(passenger);
     }
 
     @Test
     @DisplayName("Should throw NotFoundException when new user does not exist during update")
     void shouldThrowExceptionWhenNewUserDoesNotExist() {
-<<<<<<< Updated upstream
         // Arrange
         when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         doNothing().when(passengerMapper).updateEntityFromRequest(updateRequest, passenger);
-=======
         PassengerUpdateRequest localUpdate = new PassengerUpdateRequest(
                 2L,
                 "Juan Perez Updated",
@@ -336,16 +302,11 @@ class PassengerServiceImplTest {
         );
         // Arrange
         when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
->>>>>>> Stashed changes
 
         // Act & Assert
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-<<<<<<< Updated upstream
-                () -> passengerService.updatePassenger(1L, updateRequest)
-=======
                 () -> passengerService.updatePassenger(1L, localUpdate)
->>>>>>> Stashed changes
         );
 
         assertTrue(exception.getMessage().contains("Usuario con ID"));
@@ -366,11 +327,8 @@ class PassengerServiceImplTest {
                 "+573009876543"
         );
 
-<<<<<<< Updated upstream
         when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
-=======
         when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
->>>>>>> Stashed changes
         doNothing().when(passengerMapper).updateEntityFromRequest(requestWithoutUser, passenger);
         when(passengerRepository.save(passenger)).thenReturn(passenger);
 
@@ -378,11 +336,8 @@ class PassengerServiceImplTest {
         passengerService.updatePassenger(1L, requestWithoutUser);
 
         // Assert
-<<<<<<< Updated upstream
         verify(passengerRepository).findById(1L);
-=======
         verify(passengerRepository).findPassengerById(1L);
->>>>>>> Stashed changes
         verify(userRepository, never()).findById(any());
         verify(passengerMapper).updateEntityFromRequest(requestWithoutUser, passenger);
         verify(passengerRepository).save(passenger);
@@ -401,11 +356,8 @@ class PassengerServiceImplTest {
                 "+573009876543"
         );
 
-<<<<<<< Updated upstream
         when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
-=======
         when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
->>>>>>> Stashed changes
         doNothing().when(passengerMapper).updateEntityFromRequest(sameUserRequest, passenger);
         when(passengerRepository.save(passenger)).thenReturn(passenger);
 
@@ -413,11 +365,8 @@ class PassengerServiceImplTest {
         passengerService.updatePassenger(1L, sameUserRequest);
 
         // Assert
-<<<<<<< Updated upstream
         verify(passengerRepository).findById(1L);
-=======
         verify(passengerRepository).findPassengerById(1L);
->>>>>>> Stashed changes
         verify(userRepository, never()).findById(any());
         verify(passengerRepository).save(passenger);
     }
@@ -553,11 +502,8 @@ class PassengerServiceImplTest {
     @DisplayName("Should get passenger by ID successfully")
     void shouldGetPassengerByIdSuccessfully() {
         // Arrange
-<<<<<<< Updated upstream
         when(passengerRepository.findById(1L)).thenReturn(Optional.of(passenger));
-=======
         when(passengerRepository.findPassengerById(1L)).thenReturn(Optional.of(passenger));
->>>>>>> Stashed changes
         when(passengerMapper.toResponse(passenger)).thenReturn(passengerResponse);
 
         // Act
@@ -566,11 +512,8 @@ class PassengerServiceImplTest {
         // Assert
         assertNotNull(result);
         assertEquals(1L, result.id());
-<<<<<<< Updated upstream
         verify(passengerRepository).findById(1L);
-=======
         verify(passengerRepository).findPassengerById(1L);
->>>>>>> Stashed changes
         verify(passengerMapper).toResponse(passenger);
     }
 
@@ -578,11 +521,8 @@ class PassengerServiceImplTest {
     @DisplayName("Should throw NotFoundException when passenger by ID does not exist")
     void shouldThrowExceptionWhenPassengerByIdNotFound() {
         // Arrange
-<<<<<<< Updated upstream
         when(passengerRepository.findById(999L)).thenReturn(Optional.empty());
-=======
         when(passengerRepository.findPassengerById(999L)).thenReturn(Optional.empty());
->>>>>>> Stashed changes
 
         // Act & Assert
         NotFoundException exception = assertThrows(
@@ -592,11 +532,8 @@ class PassengerServiceImplTest {
 
         assertTrue(exception.getMessage().contains("Pasajero con ID"));
         assertTrue(exception.getMessage().contains("no encontrado"));
-<<<<<<< Updated upstream
         verify(passengerRepository).findById(999L);
-=======
         verify(passengerRepository).findPassengerById(999L);
->>>>>>> Stashed changes
         verify(passengerMapper, never()).toResponse(any());
     }
 
@@ -624,8 +561,4 @@ class PassengerServiceImplTest {
                 .status(UserStatus.ACTIVE)
                 .build();
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

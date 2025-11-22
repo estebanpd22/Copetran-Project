@@ -381,10 +381,7 @@ public class RouteServiceImplTest {
         route.getStops().add(stop);
 
         when(routeRepository.findRouteById(routeId)).thenReturn(Optional.of(route));
-<<<<<<< Updated upstream
-=======
         when(stopRepository.findById(stopId)).thenReturn(Optional.of(stop));
->>>>>>> Stashed changes
 
         // Act & Assert
         IllegalStateException exception = assertThrows(IllegalStateException.class,
@@ -814,8 +811,4 @@ public class RouteServiceImplTest {
 
         assertEquals("Ruta no encontrada con ID: 999", exception.getMessage());
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

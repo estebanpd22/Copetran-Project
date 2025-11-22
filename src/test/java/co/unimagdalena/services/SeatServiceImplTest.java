@@ -204,11 +204,6 @@ class SeatServiceImplTest {
         );
 
         when(seatRepository.findById(1L)).thenReturn(Optional.of(existingSeat));
-<<<<<<< Updated upstream
-        when(seatRepository.findByBusIdAndNumber(existingSeat.getBus().getId(), 1))
-                .thenReturn(Optional.empty());
-=======
->>>>>>> Stashed changes
         when(seatRepository.save(any(Seat.class))).thenReturn(updatedSeat);
         when(seatMapper.toResponse(updatedSeat)).thenReturn(response);
 
@@ -571,8 +566,4 @@ class SeatServiceImplTest {
         assertTrue(result.isEmpty());
         verify(seatRepository, times(1)).findAll();
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
